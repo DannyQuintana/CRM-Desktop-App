@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="440.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginController">
+    <children>
+        <Label fx:id="loginTitleLabel" layoutX="14.0" layoutY="14.0" text="Schedule Manager">
+            <font>
+                <Font name="System Bold" size="36.0" />
+            </font>
+        </Label>
+        <Label fx:id="userNameLabel" layoutX="36.0" layoutY="94.0" text="User Name:">
+            <font>
+                <Font size="14.0" />
+            </font>
+        </Label>
+        <Label fx:id="passwordLabel" layoutX="37.0" layoutY="172.0" text="Password:">
+            <font>
+                <Font size="14.0" />
+            </font>
+        </Label>
+        <TextField fx:id="userNameField" layoutX="41.0" layoutY="114.0" prefHeight="34.0" prefWidth="357.0" promptText="Enter user name" />
+        <Button fx:id="login" layoutX="202.0" layoutY="396.0" mnemonicParsing="false" onAction="#loginClicked" prefHeight="40.0" prefWidth="90.0" text="Login" />
+        <Button fx:id="resetButton" layoutX="313.0" layoutY="396.0" mnemonicParsing="false" onAction="#resetClicked" prefHeight="40.0" prefWidth="90.0" text="Reset">
+            <font>
+                <Font size="14.0" />
+            </font>
+        </Button>
+        <Label fx:id="timeZoneLabel" layoutX="41.0" layoutY="260.0" text="Time Zone:">
+            <font>
+                <Font size="14.0" />
+            </font>
+        </Label>
+        <MenuBar layoutX="-173.0" layoutY="318.0">
+            <menus>
+                <Menu mnemonicParsing="false" text="File">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="Close" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Edit">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="Delete" />
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Help">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+        <Label fx:id="timeZoneField" layoutX="40.0" layoutY="298.0">
+            <font>
+                <Font size="14.0" />
+            </font></Label>
+        <PasswordField fx:id="passWordField" layoutX="41.0" layoutY="203.0" prefHeight="34.0" prefWidth="357.0" promptText="Enter Password" />
+    </children>
+</AnchorPane>
