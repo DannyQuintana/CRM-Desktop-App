@@ -39,7 +39,7 @@ public abstract class DBConnection {
         }
         catch(Exception e)
         {
-            //ignore
+            e.printStackTrace();
         }
     }
 }

@@ -3,6 +3,7 @@ package controller;
 import dao.DBConnection;
 import dao.DBUsers;
 import helper.DateTimeUtilities;
+import helper.LoginTrackerUtility;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,6 +16,7 @@ import model.Users;
 import schedulingapp.c195advancejavaproject.Main;
 
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -46,6 +48,7 @@ public class LoginController implements Initializable {
 
             Users user = DBUsers.authorizeUser(DBConnection.getConnection(),userName, password);
             if(user != null){
+                LoginTrackerUtility.loginActivity(LocalDateTime.now(), true);
                 System.out.println("Access granted");
                 FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("mainView.fxml"));
                 Stage stage = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
@@ -55,6 +58,7 @@ public class LoginController implements Initializable {
                 stage.show();
                 DateTimeUtilities.appointmentAlarm();
             } else {
+                LoginTrackerUtility.loginActivity(LocalDateTime.now(), false);
                 ResourceBundle bundle = ResourceBundle.getBundle("Login");
                 String errorMessage = bundle.getString("errorMessage");
                 Alert alert = new Alert(Alert.AlertType.ERROR);

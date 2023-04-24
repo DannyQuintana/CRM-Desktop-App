@@ -6,7 +6,7 @@
 
 <AnchorPane fx:id="allAppointments" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="575.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainController">
     <children>
-        <Button layoutX="68.0" layoutY="254.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="134.0" text="Reports" />
+        <Button layoutX="68.0" layoutY="254.0" mnemonicParsing="false" onAction="#reportsClicked" prefHeight="40.0" prefWidth="134.0" text="Reports" />
         <Button layoutX="67.0" layoutY="460.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="134.0" text="Exit" />
         <TableView fx:id="AppointmentTableView" layoutX="252.0" layoutY="101.0" prefHeight="399.0" prefWidth="995.0">
             <columns>

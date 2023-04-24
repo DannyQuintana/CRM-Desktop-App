@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="575.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ReportController">
+   <children>
+      <Label layoutX="585.0" layoutY="14.0" prefHeight="47.0" prefWidth="131.0" text="Reports">
+         <font>
+            <Font size="31.0" />
+         </font>
+      </Label>
+      <TableView fx:id="appByTypeMonthTable" layoutX="54.0" layoutY="126.0" prefHeight="200.0" prefWidth="230.0">
+        <columns>
+          <TableColumn fx:id="appMonth" prefWidth="75.0" text="Month" />
+          <TableColumn fx:id="appType" prefWidth="75.0" text="Type" />
+            <TableColumn fx:id="appTotal" prefWidth="79.0" text="Total" />
+        </columns>
+      </TableView>
+      <Label layoutX="55.0" layoutY="94.0" text="Customer Appointments By Month and Type">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <ComboBox fx:id="contactBox" layoutX="635.0" layoutY="92.0" onAction="#contactBoxClicked" prefWidth="150.0" promptText="Select Contact..." />
+      <Label layoutX="408.0" layoutY="94.0" text="Appointments By Contacts">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font></Label>
+       <TableView fx:id="contactTableView" layoutX="408.0" layoutY="126.0" prefHeight="350.0" prefWidth="843.0">
+           <columns>
+               <TableColumn fx:id="appIDCol" prefWidth="44.0" text="ID" />
+               <TableColumn fx:id="titleCol" prefWidth="75.0" text="Title" />
+               <TableColumn fx:id="descripCol" prefWidth="134.0" text="Description" />
+               <TableColumn fx:id="locationCol" prefWidth="82.0" text="Location" visible="false" />
+               <TableColumn fx:id="contactCol" prefWidth="58.0" text="Contact" />
+               <TableColumn fx:id="typeCol" prefWidth="110.0" text="Type" />
+               <TableColumn fx:id="startDateTimeCol" prefWidth="170.0" text="Start Time" />
+               <TableColumn fx:id="endDateTimeCol" prefWidth="170.0" text="End Time" />
+               <TableColumn fx:id="customerIDCol" text="Customer ID" />
+               <TableColumn fx:id="userIDCol" prefWidth="71.0" text="User ID" visible="false" />
+           </columns>
+       </TableView>
+      <Button layoutX="1137.0" layoutY="516.0" mnemonicParsing="false" onAction="#toMainMenu" text="To Main Menu">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Button>
+      <Label layoutX="55.0" layoutY="337.0" text="Customer Appointments By Location">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <TableView fx:id="appLocationTable" layoutX="54.0" layoutY="368.0" prefHeight="163.0" prefWidth="230.0">
+         <columns>
+            <TableColumn fx:id="locationCustomerID" prefWidth="82.0" text="Customer ID" />
+            <TableColumn fx:id="localLocation" prefWidth="78.0" text="Location" />
+            <TableColumn fx:id="localTotal" prefWidth="69.0" text="Total" />
+         </columns>
+      </TableView>
+   </children>
+</AnchorPane>

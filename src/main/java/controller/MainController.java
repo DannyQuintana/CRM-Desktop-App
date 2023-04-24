@@ -73,6 +73,15 @@ public class MainController implements Initializable {
 
     }
 
+    public void reportsClicked(ActionEvent actionEvent) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("reportView.fxml"));
+        Stage stage = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
+        Scene scene = new Scene(fxmlLoader.load(), 1300, 600);
+        stage.setTitle("Reports");
+        stage.setScene(scene);
+        stage.show();
+    }
+
 
 
     @Override
@@ -146,4 +155,6 @@ public class MainController implements Initializable {
         customerIDCol.setCellValueFactory(new PropertyValueFactory<>("customerId"));
         userIDCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
     }
+
+
 }

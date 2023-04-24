@@ -21,8 +21,8 @@
         <Label layoutX="17.0" layoutY="192.0" text="Location" />
         <Label layoutX="17.0" layoutY="231.0" text="Contact" />
         <Button fx:id="submitButton" layoutX="32.0" layoutY="518.0" mnemonicParsing="false" onAction="#submitAppointmentClicked" text="Create" />
-      <ComboBox fx:id="startTimeBox" layoutX="73.0" layoutY="342.0" onAction="#startTimeClicked" prefWidth="150.0" />
-      <ComboBox fx:id="endTimeBox" layoutX="73.0" layoutY="383.0" onAction="#endTimeClicked" prefWidth="150.0" />
+      <ComboBox fx:id="startTimeBox" layoutX="73.0" layoutY="342.0" prefWidth="150.0" />
+      <ComboBox fx:id="endTimeBox" layoutX="73.0" layoutY="383.0" prefWidth="150.0" />
       <Label layoutX="25.0" layoutY="271.0" text="Type" />
       <Label layoutX="18.0" layoutY="387.0" text="End Time" />
 
@@ -46,13 +46,13 @@
       <Button layoutX="182.0" layoutY="519.0" mnemonicParsing="false" onAction="#clearClicked" text="Clear" />
       <Button fx:id="upDateButton" disable="true" layoutX="101.0" layoutY="519.0" mnemonicParsing="false" onAction="#upDateClicked" text="Update" />
       <TextField fx:id="typeField" layoutX="75.0" layoutY="267.0" />
-      <DatePicker fx:id="datePickerBox" layoutX="74.0" layoutY="304.0" onAction="#datePickerClicked" prefHeight="25.0" prefWidth="150.0" />
+      <DatePicker fx:id="datePickerBox" layoutX="74.0" layoutY="304.0"  prefHeight="25.0" prefWidth="150.0" />
       <Label layoutX="27.0" layoutY="308.0" text="Date" />
       <Label layoutX="16.0" layoutY="346.0" text="Start Time" />
       <Label layoutX="4.0" layoutY="426.0" text="Customer ID" />
-      <ComboBox fx:id="customerIDBox" layoutX="75.0" layoutY="422.0" onAction="#customerIDBoxClicked" prefWidth="150.0" />
-      <ComboBox fx:id="userIDBox" layoutX="73.0" layoutY="470.0" onAction="#userIDBoxClicked" prefWidth="150.0" />
+      <ComboBox fx:id="customerIDBox" layoutX="75.0" layoutY="422.0"  prefWidth="150.0" />
+      <ComboBox fx:id="userIDBox" layoutX="73.0" layoutY="470.0"  prefWidth="150.0" />
       <Label layoutX="18.0" layoutY="465.0" text="User ID" />
-      <ComboBox fx:id="contactBox" layoutX="73.0" layoutY="227.0" onAction="#contactBoxClicked" prefWidth="150.0" />
+      <ComboBox fx:id="contactBox" layoutX="73.0" layoutY="227.0" prefWidth="150.0" />
     </children>
 </AnchorPane>

@@ -116,7 +116,6 @@ public class Customer {
 
     @Override
     public String toString(){
-        return "[" + customerId + "] " + customerName + " " +address + " " + postalCode + " " + phone +
-                " " + createDate + " " + createdBy + " " + lastUpdated + " "+ lastUpdatedBy + " " + divisionId;
+        return "ID " + customerId + ": " + customerName;
     }
 }

@@ -1,5 +1,6 @@
 package model;
 
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
@@ -19,9 +20,41 @@ public class Appointment {
     private int customerId;
     private int userId;
     private int contactId;
+    //Overload fields
+    private int total;
+    private String month;
 
-    public Appointment() {
 
+    // for month, type and total, Overload
+    public Appointment(String month, String type, int total) {
+        this.month = month;
+        this.type = type;
+        this.total = total;
+    }
+
+    public Appointment(int customerId, String location, int total){
+        this.customerId = customerId;
+        this.location = location;
+        this.total = total;
+    }
+
+    public Appointment(int appointmentId, String title, String description, String location, String type, LocalDateTime start,
+                       LocalDateTime end, LocalDateTime createDate, String createdBy, Timestamp lastUpdate, String lastUpdatedBy,
+                       int customerId, int userId, int contactId) {
+        this.appointmentId = appointmentId;
+        this.title = title;
+        this.description = description;
+        this.location = location;
+        this.type = type;
+        this.start = start;
+        this.end = end;
+        this.createDate = createDate;
+        this.createdBy = createdBy;
+        this.lastUpdate = lastUpdate;
+        this.lastUpdatedBy = lastUpdatedBy;
+        this.customerId = customerId;
+        this.userId = userId;
+        this.contactId = contactId;
     }
 
     public int getCustomerId() {
@@ -48,24 +81,6 @@ public class Appointment {
         this.contactId = contactId;
     }
 
-    public Appointment(int appointmentId, String title, String description, String location, String type, LocalDateTime start,
-                       LocalDateTime end, LocalDateTime createDate, String createdBy, Timestamp lastUpdate, String lastUpdatedBy,
-                       int customerId, int userId, int contactId) {
-        this.appointmentId = appointmentId;
-        this.title = title;
-        this.description = description;
-        this.location = location;
-        this.type = type;
-        this.start = start;
-        this.end = end;
-        this.createDate = createDate;
-        this.createdBy = createdBy;
-        this.lastUpdate = lastUpdate;
-        this.lastUpdatedBy = lastUpdatedBy;
-        this.customerId = customerId;
-        this.userId = userId;
-        this.contactId = contactId;
-    }
 
     public int getAppointmentId() {
         return appointmentId;
@@ -154,6 +169,23 @@ public class Appointment {
     public void setLastUpdatedBy(String lastUpdatedBy) {
         this.lastUpdatedBy = lastUpdatedBy;
     }
+
+    public int getTotal() {
+        return total;
+    }
+
+    public void setTotal(int total) {
+        this.total = total;
+    }
+
+    public String getMonth() {
+        return month;
+    }
+
+    public void setMonth(String month) {
+        this.month = month;
+    }
+
 
     @Override
     public String toString(){

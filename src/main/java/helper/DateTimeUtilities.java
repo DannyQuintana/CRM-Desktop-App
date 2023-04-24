@@ -25,6 +25,16 @@ public class DateTimeUtilities {
         return utcZDT.toLocalDateTime();
     }
 
+    public static LocalDateTime convertToUTC(LocalDateTime local){
+        ZoneId localZone = ZoneId.systemDefault();
+        ZoneId utcZone = ZoneId.of("UTC");
+        ZonedDateTime zDT = ZonedDateTime.of(local, localZone);
+
+        ZonedDateTime utcZDT = ZonedDateTime.ofInstant(zDT.toInstant(), utcZone);
+
+        return utcZDT.toLocalDateTime();
+    }
+
     public static LocalDateTime convertToEST (LocalDateTime lDT){
         ZoneId local = ZoneId.systemDefault();
         ZoneId estZone = ZoneId.of("EST");
@@ -70,7 +80,5 @@ public class DateTimeUtilities {
         } catch(Exception e){
             e.printStackTrace();
         }
-
-
     }
 }

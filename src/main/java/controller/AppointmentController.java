@@ -5,6 +5,7 @@ import dao.DBContact;
 import dao.DBCustomer;
 import dao.DBUsers;
 import helper.DateTimeUtilities;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -21,9 +22,7 @@ import schedulingapp.c195advancejavaproject.Main;
 
 import java.io.IOException;
 import java.net.URL;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -76,11 +75,12 @@ public class AppointmentController implements Initializable {
         contactBox.setItems(DBContact.getAllContacts());
 
         // Populating localTime boxes
-        LocalTime start = LocalTime.of(8, 0);
-        LocalTime end = LocalTime.of(20, 15);
 
-        LocalTime  endStart = LocalTime.of(8, 0);
-        LocalTime endEnd = LocalTime.of(20, 15);
+        LocalTime start = LocalTime.of(1, 0);
+        LocalTime end = LocalTime.of(23, 45);
+
+        LocalTime endStart = LocalTime.of(1, 0);
+        LocalTime endEnd = LocalTime.of(23, 45);
 
         while(start.isBefore(end)){
             startTimeBox.getItems().add(start);
@@ -91,8 +91,6 @@ public class AppointmentController implements Initializable {
             endTimeBox.getItems().add(endStart);
             endStart = endStart.plusMinutes(15);
         }
-
-
     }
 
 
@@ -117,16 +115,31 @@ public class AppointmentController implements Initializable {
         int customer = customerIDBox.getSelectionModel().getSelectedItem().getCustomerId();
         int user = userIDBox.getSelectionModel().getSelectedItem().getUserId();
 
-        DBAppointment.addAppointment(title, description, location, type, startDateTime, endDateTime, customer, user, contact);
+       boolean overlapConfirm = checkAppointmentOverlap(customer,startDateTime, endDateTime);
+        System.out.println(overlapConfirm);
+       boolean checkBusinessHours = checkIfESTHours(startDateTime, endDateTime, date);
+        System.out.println(checkBusinessHours);
 
-        AppointmentTableView.setItems(DBAppointment.getAllAppointments());
-        clearAllFields();
+       if(overlapConfirm && checkBusinessHours) {
+           DBAppointment.addAppointment(title, description, location, type, startDateTime, endDateTime, customer, user, contact);
+           AppointmentTableView.setItems(DBAppointment.getAllAppointments());
+           clearAllFields();
+           System.out.println("confirmed and ran");
+       } else if (!overlapConfirm) {
+           Alert alert = new Alert(Alert.AlertType.ERROR);
+           alert.setContentText("Overlapping Appointments, please select another time");
+           alert.showAndWait();
+       }else {
+           Alert alert = new Alert(Alert.AlertType.ERROR);
+           alert.setContentText("Business Hours must be between 8:00am to 10:00pm EST, please select another time");
+           alert.showAndWait();
+       }
     }
+
 
 
     public void updateAppointment(ActionEvent actionEvent) {
         Appointment pickedAppointment = (Appointment) AppointmentTableView.getSelectionModel().getSelectedItem();
-
 
         if (pickedAppointment != null) {
 
@@ -144,8 +157,6 @@ public class AppointmentController implements Initializable {
             endTimeBox.getSelectionModel().select(DateTimeUtilities.convertToLocalTime(pickedAppointment.getEnd()).toLocalTime());
             customerIDBox.getSelectionModel().select(DBCustomer.getCustomer(pickedAppointment.getCustomerId() - 1));
             userIDBox.getSelectionModel().select(DBUsers.getUser(pickedAppointment.getUserId() - 1));
-
-
         }
     }
 
@@ -172,15 +183,13 @@ public class AppointmentController implements Initializable {
                 AppointmentTableView.setItems(DBAppointment.getAllAppointments());
             }
         }
-
-
     }
 
     public void toMaineMenu(ActionEvent actionEvent) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("mainView.fxml"));
         Stage stage = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
         Scene scene = new Scene(fxmlLoader.load(), 1300, 575);
-        stage.setTitle("Appointment Scheduling Application");
+        stage.setTitle("Main Menu");
         stage.setScene(scene);
         stage.show();
     }
@@ -209,12 +218,23 @@ public class AppointmentController implements Initializable {
         int userId = userIDBox.getSelectionModel().getSelectedItem().getUserId();
         int contactId = contactBox.getSelectionModel().getSelectedItem().getContactId();
 
+        boolean overlapConfirm = checkAppointmentOverlap(customerId,startDateTime, endDateTime);
+        boolean checkBusinessHours = checkIfESTHours(startDateTime, endDateTime, date);
 
-        DBAppointment.updateAppointment(appID, title, description, location, type, startDateTime, endDateTime, customerId, userId, contactId);
+        if(overlapConfirm && checkBusinessHours) {
+            DBAppointment.addAppointment(title, description, location, type, startDateTime, endDateTime, customerId, userId, contactId);
+            AppointmentTableView.setItems(DBAppointment.getAllAppointments());
+            clearAllFields();
+        } else if (!overlapConfirm) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText("Overlapping Appointments, please select another time");
+            alert.showAndWait();
+        }else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText("Business Hours must be between 8:00am to 10:00pm EST, please select another time");
+            alert.showAndWait();
+        }
 
-        AppointmentTableView.setItems(DBAppointment.getAllAppointments());
-
-        clearAllFields();
     }
 
 
@@ -234,23 +254,40 @@ public class AppointmentController implements Initializable {
         userIDBox.valueProperty().setValue(null);
     }
 
+    private boolean checkIfESTHours(LocalDateTime startDT, LocalDateTime endDT, LocalDate date){
+        //Set to ZonedDateTime to be able to evaluate time offset.
+        ZonedDateTime startZDT = ZonedDateTime.of(startDT, ZoneId.systemDefault());
+        ZonedDateTime endZDT = ZonedDateTime.of(endDT, ZoneId.systemDefault());
 
-    //Field Combo/Time action events
-    public void startTimeClicked(ActionEvent actionEvent) {
+        ZonedDateTime openBusinessHours = ZonedDateTime.of(date, LocalTime.of(8,0), ZoneId.of("America/New_York"));
+        ZonedDateTime closedBusinessHours = ZonedDateTime.of(date, LocalTime.of(22,0), ZoneId.of("America/New_York"));
+
+        return !startZDT.isBefore(openBusinessHours) &&
+                !startZDT.isAfter(closedBusinessHours) &&
+                !endZDT.isBefore(openBusinessHours) &&
+                !endZDT.isAfter(closedBusinessHours) &&
+                !startZDT.isAfter(endZDT);
     }
 
-    public void endTimeClicked(ActionEvent actionEvent) {
-    }
+    private boolean checkAppointmentOverlap(int customerId ,LocalDateTime sLDT, LocalDateTime eLDT) {
+        ObservableList<Appointment> customerAppList = DBAppointment.getAppointmentByCustomerId(customerId);
+        System.out.println(customerAppList);
+        if (!customerAppList.isEmpty()) {
+            for (Appointment app : customerAppList) {
+                //convert both the times zones into UTC time to be compared.
+                LocalDateTime startTime = DateTimeUtilities.convertToUTC(app.getStart());
+                LocalDateTime endTime = DateTimeUtilities.convertToUTC(app.getEnd());
 
-    public void datePickerClicked(ActionEvent actionEvent) {
-    }
-
-    public void customerIDBoxClicked(ActionEvent actionEvent) {
-    }
-
-    public void userIDBoxClicked(ActionEvent actionEvent) {
-    }
-
-    public void contactBoxClicked(ActionEvent actionEvent) {
+                if ((startTime.isBefore(sLDT) || startTime.isEqual(sLDT)) & (endTime.isAfter(eLDT) || endTime.isEqual(eLDT))) {
+                    return false;
+                }
+                if (startTime.isBefore(eLDT) & startTime.isAfter(sLDT)) {
+                    return false;
+                } else {
+                    return !(endTime.isBefore(eLDT) & endTime.isAfter(sLDT));
+                }
+            }
+        }
+        return true;
     }
 }
