@@ -21,6 +21,7 @@ import model.Users;
 import schedulingapp.c195advancejavaproject.Main;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.time.*;
 import java.util.Optional;
@@ -50,7 +51,7 @@ public class AppointmentController implements Initializable {
     public ComboBox<Customer> customerIDBox;
     public ComboBox<Users> userIDBox;
     public ComboBox<Contact> contactBox;
-    public TableView AppointmentTableView;
+    public TableView<Appointment> AppointmentTableView;
 
 
     @Override
@@ -109,31 +110,79 @@ public class AppointmentController implements Initializable {
 
 
         // Create date times to pass as arguments to DBAppointment converting to UTC time
-        LocalDateTime startDateTime = DateTimeUtilities.convertToUTC(date, start);
-        LocalDateTime endDateTime = DateTimeUtilities.convertToUTC(date, end);
+        LocalDateTime startDateTime = LocalDateTime.of(date, start);
+        LocalDateTime endDateTime = LocalDateTime.of(date, end);
 
         int customer = customerIDBox.getSelectionModel().getSelectedItem().getCustomerId();
         int user = userIDBox.getSelectionModel().getSelectedItem().getUserId();
+            if (title.isBlank() || description.isBlank() || location.isBlank() || type.isBlank()) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setContentText("Fields can not be left blank, please check the form to ensure all fields have values.");
+                alert.showAndWait();
+            } else if (startDateTime.isAfter(endDateTime)) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setContentText("Start time needs to be before end time.");
+                alert.showAndWait();
+            } else if (endDateTime.isBefore(startDateTime)) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setContentText("End time must be greater than start time.");
+                alert.showAndWait();
+            } else if (startDateTime.isEqual(endDateTime)) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setContentText("Start and End time can not be equal");
+                alert.showAndWait();
+            } else {
 
-       boolean overlapConfirm = checkAppointmentOverlap(customer,startDateTime, endDateTime);
-        System.out.println(overlapConfirm);
-       boolean checkBusinessHours = checkIfESTHours(startDateTime, endDateTime, date);
-        System.out.println(checkBusinessHours);
+                if (checkAppointmentOverlap(customer, startDateTime, endDateTime) && checkIfESTHours(startDateTime, endDateTime, date)) {
+                    DBAppointment.addAppointment(title, description, location, type, DateTimeUtilities.convertToUTC(startDateTime), DateTimeUtilities.convertToUTC(endDateTime), customer, user, contact);
+                    AppointmentTableView.setItems(DBAppointment.getAllAppointments());
+                    clearAllFields();
+                } else if (!checkIfESTHours(startDateTime, endDateTime, date)) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setContentText("The selected time are outside of Business hours. The business hours must be between 8:00am to 10:00pm EST");
+                    alert.showAndWait();
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setContentText("Customer is already scheduled for another appointment between the selected times: " + startDateTime + " and " + endDateTime + ". Please Select another time.");
+                    alert.showAndWait();
+                }
+            }
+    }
 
-       if(overlapConfirm && checkBusinessHours) {
-           DBAppointment.addAppointment(title, description, location, type, startDateTime, endDateTime, customer, user, contact);
-           AppointmentTableView.setItems(DBAppointment.getAllAppointments());
-           clearAllFields();
-           System.out.println("confirmed and ran");
-       } else if (!overlapConfirm) {
-           Alert alert = new Alert(Alert.AlertType.ERROR);
-           alert.setContentText("Overlapping Appointments, please select another time");
-           alert.showAndWait();
-       }else {
-           Alert alert = new Alert(Alert.AlertType.ERROR);
-           alert.setContentText("Business Hours must be between 8:00am to 10:00pm EST, please select another time");
-           alert.showAndWait();
-       }
+    public void upDateClicked(ActionEvent actionEvent) {
+        int id = Integer.parseInt(appIDField.getText());
+        String title = appTitleField.getText();
+        String description = descriptionField.getText();
+        String location = locationField.getText();
+        String type = typeField.getText();
+
+        LocalDate date = datePickerBox.getValue();
+        LocalTime start = startTimeBox.getSelectionModel().getSelectedItem();
+        LocalTime end = endTimeBox.getSelectionModel().getSelectedItem();
+
+        LocalDateTime startDateTime = DateTimeUtilities.convertToUTC(date, start);
+        LocalDateTime endDateTime = DateTimeUtilities.convertToUTC(date, end);
+
+        int customerId = customerIDBox.getSelectionModel().getSelectedItem().getCustomerId();
+        int userId = userIDBox.getSelectionModel().getSelectedItem().getUserId();
+        int contactId = contactBox.getSelectionModel().getSelectedItem().getContactId();
+
+        boolean overlapConfirm = checkAppointmentOverlap(customerId,startDateTime, endDateTime);
+        boolean checkBusinessHours = checkIfESTHours(startDateTime, endDateTime, date);
+
+        if(overlapConfirm && !checkBusinessHours) {
+            DBAppointment.updateAppointment(id, title, description, location, type, startDateTime, endDateTime, customerId, userId, contactId);
+            AppointmentTableView.setItems(DBAppointment.getAllAppointments());
+            clearAllFields();
+        } else if (!overlapConfirm) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText("Overlapping Appointments, please select another time");
+            alert.showAndWait();
+        }else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText("Business Hours must be between 8:00am to 10:00pm EST Monday to Friday, please select another Date or time");
+            alert.showAndWait();
+        }
     }
 
 
@@ -153,8 +202,8 @@ public class AppointmentController implements Initializable {
             contactBox.getSelectionModel().select(DBContact.getContact(pickedAppointment.getContactId() - 1));
             typeField.setText(pickedAppointment.getType());
             datePickerBox.setValue(DateTimeUtilities.convertToLocalTime(pickedAppointment.getStart()).toLocalDate());
-            startTimeBox.getSelectionModel().select(DateTimeUtilities.convertToLocalTime(pickedAppointment.getStart()).toLocalTime());
-            endTimeBox.getSelectionModel().select(DateTimeUtilities.convertToLocalTime(pickedAppointment.getEnd()).toLocalTime());
+            startTimeBox.getSelectionModel().select(pickedAppointment.getStart().toLocalTime());
+            endTimeBox.getSelectionModel().select(pickedAppointment.getEnd().toLocalTime());
             customerIDBox.getSelectionModel().select(DBCustomer.getCustomer(pickedAppointment.getCustomerId() - 1));
             userIDBox.getSelectionModel().select(DBUsers.getUser(pickedAppointment.getUserId() - 1));
         }
@@ -200,44 +249,6 @@ public class AppointmentController implements Initializable {
 
     }
 
-    public void upDateClicked(ActionEvent actionEvent) {
-        int appID = Integer.parseInt(appIDField.getText());
-        String title = appTitleField.getText();
-        String description = descriptionField.getText();
-        String location = locationField.getText();
-        String type = typeField.getText();
-
-        LocalDate date = datePickerBox.getValue();
-        LocalTime start = startTimeBox.getSelectionModel().getSelectedItem();
-        LocalTime end = endTimeBox.getSelectionModel().getSelectedItem();
-
-        LocalDateTime startDateTime = DateTimeUtilities.convertToUTC(date, start);
-        LocalDateTime endDateTime = DateTimeUtilities.convertToUTC(date, end);
-
-        int customerId = customerIDBox.getSelectionModel().getSelectedItem().getCustomerId();
-        int userId = userIDBox.getSelectionModel().getSelectedItem().getUserId();
-        int contactId = contactBox.getSelectionModel().getSelectedItem().getContactId();
-
-        boolean overlapConfirm = checkAppointmentOverlap(customerId,startDateTime, endDateTime);
-        boolean checkBusinessHours = checkIfESTHours(startDateTime, endDateTime, date);
-
-        if(overlapConfirm && checkBusinessHours) {
-            DBAppointment.addAppointment(title, description, location, type, startDateTime, endDateTime, customerId, userId, contactId);
-            AppointmentTableView.setItems(DBAppointment.getAllAppointments());
-            clearAllFields();
-        } else if (!overlapConfirm) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText("Overlapping Appointments, please select another time");
-            alert.showAndWait();
-        }else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText("Business Hours must be between 8:00am to 10:00pm EST, please select another time");
-            alert.showAndWait();
-        }
-
-    }
-
-
     private void clearAllFields(){
         submitButton.setDisable(false);
         upDateButton.setDisable(true);
@@ -254,40 +265,58 @@ public class AppointmentController implements Initializable {
         userIDBox.valueProperty().setValue(null);
     }
 
-    private boolean checkIfESTHours(LocalDateTime startDT, LocalDateTime endDT, LocalDate date){
-        //Set to ZonedDateTime to be able to evaluate time offset.
-        ZonedDateTime startZDT = ZonedDateTime.of(startDT, ZoneId.systemDefault());
-        ZonedDateTime endZDT = ZonedDateTime.of(endDT, ZoneId.systemDefault());
 
-        ZonedDateTime openBusinessHours = ZonedDateTime.of(date, LocalTime.of(8,0), ZoneId.of("America/New_York"));
-        ZonedDateTime closedBusinessHours = ZonedDateTime.of(date, LocalTime.of(22,0), ZoneId.of("America/New_York"));
+    private boolean checkIfESTHours(LocalDateTime proposedStart, LocalDateTime proposedEnd, LocalDate date){
+        //First we will create the hours parameters of 8:00am to 10:00pm EST Time
+        LocalDateTime openBusinessHours = LocalDateTime.of(date, LocalTime.of(8, 0));
+        LocalDateTime closedBusinessHours = LocalDateTime.of(date, LocalTime.of(22, 0));
 
-        return !startZDT.isBefore(openBusinessHours) &&
-                !startZDT.isAfter(closedBusinessHours) &&
-                !endZDT.isBefore(openBusinessHours) &&
-                !endZDT.isAfter(closedBusinessHours) &&
-                !startZDT.isAfter(endZDT);
+        //Next convert the proposedStart and ProposedEnd to EST time
+        proposedStart.atZone(ZoneId.of("America/New_York"));
+        proposedEnd.atZone(ZoneId.of("America/New_York"));
+
+        //Defining work week
+        DayOfWeek saturday = DayOfWeek.SATURDAY;
+        DayOfWeek sunday = DayOfWeek.SUNDAY;
+
+        //next Compare the business hours to the start and end
+        if(proposedStart.isBefore(openBusinessHours) || proposedStart.isAfter(closedBusinessHours) || (date.getDayOfWeek() == saturday || date.getDayOfWeek() == sunday)){
+            return false;
+        } else {
+            return !proposedEnd.isBefore(openBusinessHours) && !proposedEnd.isAfter(closedBusinessHours);
+        }
     }
 
-    private boolean checkAppointmentOverlap(int customerId ,LocalDateTime sLDT, LocalDateTime eLDT) {
+    private boolean checkAppointmentOverlap(int customerId ,LocalDateTime proposedStart, LocalDateTime proposedEnd) {
+        //Create a list of each appointment that a customer is attached too. The customer ID variable will come from the combo box.
         ObservableList<Appointment> customerAppList = DBAppointment.getAppointmentByCustomerId(customerId);
         System.out.println(customerAppList);
-        if (!customerAppList.isEmpty()) {
-            for (Appointment app : customerAppList) {
-                //convert both the times zones into UTC time to be compared.
-                LocalDateTime startTime = DateTimeUtilities.convertToUTC(app.getStart());
-                LocalDateTime endTime = DateTimeUtilities.convertToUTC(app.getEnd());
 
-                if ((startTime.isBefore(sLDT) || startTime.isEqual(sLDT)) & (endTime.isAfter(eLDT) || endTime.isEqual(eLDT))) {
+        //Check if List is empty. If the list has items we need toLoop through each item and compare the start and end times to the proposedStart and endTimes.
+        if(!customerAppList.isEmpty()) {
+            for (Appointment app : customerAppList) {
+                LocalDateTime startTime = app.getStart();
+                LocalDateTime endTime = app.getEnd();
+                System.out.println("Start Time:" + startTime);
+                System.out.println("End Time: " + endTime);
+
+                //If startTime is before or equal (proposed >= start AND start < End)
+                if( (proposedStart.isAfter(startTime) || proposedStart.isEqual(startTime)) && proposedStart.isBefore(endTime)) {
                     return false;
                 }
-                if (startTime.isBefore(eLDT) & startTime.isAfter(sLDT)) {
+                //proposed end is After the start time but is before the end of the meeting
+                if(proposedEnd.isAfter(startTime) && (proposedEnd.isBefore(endTime) || proposedEnd.isEqual(endTime)) ){
                     return false;
-                } else {
-                    return !(endTime.isBefore(eLDT) & endTime.isAfter(sLDT));
+                }
+                //proposed time is before and after the start time
+                if((proposedStart.isBefore(startTime) || proposedStart.isEqual(startTime)) && (proposedEnd.isAfter(endTime) || proposedEnd.isEqual(endTime))){
+                    return false;
                 }
             }
         }
         return true;
     }
+
+
+
 }

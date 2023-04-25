@@ -83,7 +83,7 @@ examples to format addresses:
 
 
 
-------------------------------------------------------------------------------------------------------------------------
+---------------------------------COMPLETE---------------------------------------------------------------------------------------
 
 
 3.  Add scheduling functionalities to the GUI-based application by doing the following:
@@ -138,14 +138,14 @@ Note: There are up to three time zones in effect. Coordinated Universal Time (UT
 database, the user’s local time is used for display purposes, and Eastern Standard Time (EST) is used for the company’s
 office hours. Local time will be checked against EST business hours before they are stored in the database as UTC.
 
-
+-----------------------------------------------------------------------------------------------------------------------
 
 d.  Write code to implement input validation and logical error checks to prevent each of the following changes when
     adding or updating information; display a custom message specific for each error check in the user interface:
 
-•  scheduling an appointment outside of business hours defined as 8:00 a.m. to 10:00 p.m. EST, including weekends
+  scheduling an appointment outside of business hours defined as 8:00 a.m. to 10:00 p.m. EST, including weekends
 
-•  scheduling overlapping appointments for customers
+**COMPLETE**•  scheduling overlapping appointments for customers
 
 **COMPLETE**•  entering an incorrect username and password
 
