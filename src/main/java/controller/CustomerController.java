@@ -1,8 +1,14 @@
+/**
+ * The Customer controller interacts with the view and DB operations, to display, and Perform CRUD operations on
+ * the customer, country, and division tables.
+ */
+
 package controller;
 
 import dao.DBCountries;
 import dao.DBCustomer;
 import dao.DBDivisions;
+import helper.DateTimeUtilities;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -19,6 +25,8 @@ import schedulingapp.c195advancejavaproject.Main;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -43,6 +51,11 @@ public class CustomerController implements Initializable {
     public Button submitButton;
     public TableColumn divisionID;
 
+    /**
+     * The submitCustomerBtn method is an on actionEvent that will submit NEW customer entries.
+     * The method extracts information from the fields, performs basic validation and then uses the DBCustomer.addCustomer
+     * method to create a new customer entry.
+     */
     public void submitCustomerBtn(ActionEvent actionEvent) throws IOException {
         String name = nameField.getText();
         String address = addressField.getText();
@@ -50,21 +63,41 @@ public class CustomerController implements Initializable {
         String phone = phoneField.getText();
         int division = state.getSelectionModel().getSelectedItem().getDivisionId();
 
-
-        DBCustomer.addCustomer(name, address, postalCode, phone, division);
-
-        customerTable.setItems(DBCustomer.getAllCustomers());
-        clearAllFields();
-
+        try {
+            if (name.isBlank() || address.isBlank() || postalCode.isBlank() || phone.isBlank() || state.getSelectionModel().getSelectedItem() == null) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setContentText("All forms must be complete before submitting.");
+                alert.showAndWait();
+            } else {
+                DBCustomer.addCustomer(name, address, postalCode, phone, division);
+                Alert alert1 = new Alert(Alert.AlertType.INFORMATION);
+                alert1.setContentText("Customer entry saved!");
+                alert1.showAndWait();
+                customerTable.setItems(DBCustomer.getAllCustomers());
+                clearAllFields();
+            }
+        } catch (RuntimeException error){
+            error.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText("All forms must be complete before submitting.");
+            alert.showAndWait();
+        }
     }
 
+    /**
+     * The initialize method populates the customer view by retrieving information from the Database.
+     * Lambda Expression - The lambda expression is used to automatically update the customer infor boxes and
+     * also enables the use of the update button. This expression is not only a quality of life feature for users,
+     * but also avoids adding a button, and action event item to the view.
+     * @param url
+     * @param resourceBundle
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
         country.setItems(countries);
         country.setVisibleRowCount(5);
-
         int countryID = country.getSelectionModel().getSelectedIndex();
-
         if (Objects.equals(countryID, 1)) {
             state.setItems(DBDivisions.getAllUSA());
         }
@@ -75,7 +108,9 @@ public class CustomerController implements Initializable {
 
         if (Objects.equals(countryID, 3)) {
             state.setItems(DBDivisions.getAllCA());
-        }
+        };
+
+
 
         customerTable.setItems(DBCustomer.getAllCustomers());
 
@@ -86,8 +121,19 @@ public class CustomerController implements Initializable {
         customerPhoneCol.setCellValueFactory(new PropertyValueFactory<>("phone"));
         divisionID.setCellValueFactory(new PropertyValueFactory<>("divisionId"));
 
+        //Lambda Expression - Automatically populates fields when clicked in tableview.
+        customerTable.getSelectionModel().selectedItemProperty().addListener((obs, previousSelection, currentSelection) -> {
+            if (currentSelection != null){
+                updateCustomerFields();
+            }
+        });
+
     }
 
+    /**
+     * The countryClick method updates the state combo-box depending on which Country is selected.
+     * @param actionEvent
+     */
     public void countryClick(ActionEvent actionEvent) {
         int countryID = country.getSelectionModel().getSelectedIndex();
 
@@ -106,25 +152,29 @@ public class CustomerController implements Initializable {
 
     }
 
-    public void updateCustomerClicked(ActionEvent actionEvent) {
+    /**
+     * The updateCustomerClicked method updates the forms, and combo boxes of the view with the selected customer from
+     * the table view.
+     */
+    public void updateCustomerFields(){
         Customer pickedCustomer = (Customer) customerTable.getSelectionModel().getSelectedItem();
+        submitButton.setDisable(true);
+        upDateButton.setDisable(false);
 
-        if (pickedCustomer != null) {
+        customerIDField.setText(Integer.toString(pickedCustomer.getCustomerId()));
+        nameField.setText(pickedCustomer.getCustomerName());
+        addressField.setText(pickedCustomer.getAddress());
+        postalCodeField.setText(pickedCustomer.getPostalCode());
+        phoneField.setText(pickedCustomer.getPhone());
+        country.getSelectionModel().select(DBCountries.getCountry(getCountry()));
+        state.getSelectionModel().select(DBDivisions.getDivision(getStateProvidence()));
 
-            submitButton.setDisable(true);
-            upDateButton.setDisable(false);
-
-            customerIDField.setText(Integer.toString(pickedCustomer.getCustomerId()));
-            nameField.setText(pickedCustomer.getCustomerName());
-            addressField.setText(pickedCustomer.getAddress());
-            postalCodeField.setText(pickedCustomer.getPostalCode());
-            phoneField.setText(pickedCustomer.getPhone());
-            country.getSelectionModel().select(DBCountries.getCountry(getCountry()));
-            state.getSelectionModel().select(DBDivisions.getDivision(getStateProvidence()));
-
-        }
     }
 
+    /**
+     * The getStateProvidence returns the divisionId.
+     * @return
+     */
     public int getStateProvidence(){
         ObservableList<Divisions> us = DBDivisions.getAllUSA();
         ObservableList<Divisions> uk = DBDivisions.getAllUK();
@@ -169,6 +219,10 @@ public class CustomerController implements Initializable {
         return division;
     }
 
+    /**
+     * getCountry method returns the countryID
+     * @return
+     */
     public int getCountry(){
 
         Customer pickedCustomer = (Customer) customerTable.getSelectionModel().getSelectedItem();
@@ -191,6 +245,11 @@ public class CustomerController implements Initializable {
     }
 
 
+    /**
+     * The deleteCustomer takes the selected customer, parses the customer ID and then performs a delete operation,
+     * by passing the customerId into the DBCustomer.deleteCustomer() method.
+     * @param actionEvent
+     */
     public void deleteCustomer(ActionEvent actionEvent) {
 
         Customer selectedCustomer = (Customer) customerTable.getSelectionModel().getSelectedItem();
@@ -211,10 +270,17 @@ public class CustomerController implements Initializable {
 
             if (select.get() == ButtonType.OK) {
                 DBCustomer.deleteCustomer(customerID);
+
+                Alert alert1 = new Alert(Alert.AlertType.INFORMATION);
+                alert1.setContentText("Customer ID: " + customerID + " has been deleted.");
+                alert1.showAndWait();
+
                 customerTable.setItems(DBCustomer.getAllCustomers());
+
             }
         }
     }
+
 
     public void toMaineMenu(ActionEvent actionEvent) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("mainView.fxml"));
@@ -223,8 +289,14 @@ public class CustomerController implements Initializable {
         stage.setTitle("Appointment Scheduling Application");
         stage.setScene(scene);
         stage.show();
+        DateTimeUtilities.appointmentAlarmMenuReturn();
     }
 
+    /**
+     * The upDateClicked method parses the information from the text-fields and combo-boxes, and passes the fields as
+     * arguments for the DBCustomer.updateCustomer() method.
+     * @param actionEvent
+     */
     public void upDateClicked(ActionEvent actionEvent) {
         int id = Integer.parseInt(customerIDField.getText());
         String name = nameField.getText();
@@ -240,10 +312,9 @@ public class CustomerController implements Initializable {
         clearAllFields();
     }
 
-    public void clearFields(ActionEvent actionEvent) {
-        clearAllFields();
-    }
-
+    /**
+     * The clearFields resets each field on the customer form.
+     */
     private void clearAllFields(){
         submitButton.setDisable(false);
         upDateButton.setDisable(true);
@@ -255,5 +326,9 @@ public class CustomerController implements Initializable {
         phoneField.clear();
         country.valueProperty().setValue(null);
         state.valueProperty().setValue(null);
+    }
+
+    public void clearFields(ActionEvent actionEvent) {
+        clearAllFields();
     }
 }

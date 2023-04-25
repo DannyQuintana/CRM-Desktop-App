@@ -1,3 +1,7 @@
+/**
+ * The DateTimeUtilities is used to convert time zones and set meeting notification.
+ */
+
 package helper;
 
 import dao.DBAppointment;
@@ -6,25 +10,17 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import model.Appointment;
 
-import java.sql.SQLException;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
+
 
 public class DateTimeUtilities {
 
-
-    public static LocalDateTime convertToUTC(LocalDate lDate, LocalTime lTime){
-        LocalDateTime local = LocalDateTime.of(lDate, lTime);
-        ZoneId localZone = ZoneId.systemDefault();
-        ZoneId utcZone = ZoneId.of("UTC");
-        ZonedDateTime zDT = ZonedDateTime.of(local, localZone);
-
-        ZonedDateTime utcZDT = ZonedDateTime.ofInstant(zDT.toInstant(), utcZone);
-
-        return utcZDT.toLocalDateTime();
-    }
-
+    /**
+     * Converts LocalDateTime objects to UTC ZonedDateTime objects that is returned as a LocalDateTime object.
+     * @param local
+     * @return
+     */
     public static LocalDateTime convertToUTC(LocalDateTime local){
         ZoneId localZone = ZoneId.systemDefault();
         ZoneId utcZone = ZoneId.of("UTC");
@@ -35,15 +31,11 @@ public class DateTimeUtilities {
         return utcZDT.toLocalDateTime();
     }
 
-    public static LocalDateTime convertToEST (LocalDateTime lDT){
-        ZoneId local = ZoneId.systemDefault();
-        ZoneId estZone = ZoneId.of("EST");
-        ZonedDateTime zDT = ZonedDateTime.of(lDT, local);
-        ZonedDateTime etsZDT = ZonedDateTime.ofInstant(zDT.toInstant(), estZone);
-
-        return etsZDT.toLocalDateTime();
-    }
-
+    /**
+     * Converts LocalDateTime objects to systemDefault time zones.
+     * @param lDT
+     * @return
+     */
     public static LocalDateTime convertToLocalTime(LocalDateTime lDT){
         ZoneId local = ZoneId.systemDefault();
         ZoneId utcZone = ZoneId.of("UTC");
@@ -53,32 +45,58 @@ public class DateTimeUtilities {
         return localZDT.toLocalDateTime();
     }
 
+    /**
+     * Checks a list of appoitnments and notifies user with an appointment is within 15 minutes of local time.
+     */
     public static void appointmentAlarm(){
-        ObservableList<Appointment> upcomingAppointments = FXCollections.observableArrayList();
-        try {
-            for(Appointment app : DBAppointment.getAllAppointments()){
-                LocalDateTime start = app.getStart();
-                if(start.isAfter(( LocalDateTime.now())) && start.isBefore(start.plusMinutes(15))){
-                    upcomingAppointments.add(app);
-                }
-            }
+        ObservableList<Appointment> upcomingAppointment = FXCollections.observableArrayList();
+        boolean within15 = false;
 
-            if(upcomingAppointments.isEmpty()){
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setContentText("No meetings in the next 15 minutes.");
-                alert.showAndWait();
-            } else {
-                for(Appointment app : upcomingAppointments){
+            for(Appointment app : DBAppointment.getAllAppointments()) {
+                LocalDateTime start = app.getStart();
+                LocalDateTime now = LocalDateTime.now();
+                long timeDifference = ChronoUnit.MINUTES.between(now, start);
+                if (timeDifference > 0 && timeDifference <= 15) {
+                    upcomingAppointment.add(app);
+                    within15 = true;
+                }
+
+                if (within15) {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setContentText("The following meeting are within 15 minutes ID: "+ app.getAppointmentId() +
-                            " Start time: " +DateTimeUtilities.convertToLocalTime(app.getStart()) + " End Time " +
-                            DateTimeUtilities.convertToLocalTime( app.getEnd() )+ " .");
+                    alert.setContentText("The following meeting is within the next 15 minutes. ID: " + app.getAppointmentId() +
+                            " Start time: " + app.getStart() + " End Time " +
+                            app.getEnd() + " .");
                     alert.showAndWait();
                 }
             }
 
-        } catch(Exception e){
-            e.printStackTrace();
+            if(upcomingAppointment.isEmpty()){
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setContentText("No meetings in the next 15 minutes.");
+                    alert.showAndWait();
+                }
+            }
+
+    public static void appointmentAlarmMenuReturn(){
+        ObservableList<Appointment> upcomingAppointment = FXCollections.observableArrayList();
+        boolean within15 = false;
+
+        for(Appointment app : DBAppointment.getAllAppointments()) {
+            LocalDateTime start = app.getStart();
+            LocalDateTime now = LocalDateTime.now();
+            long timeDifference = ChronoUnit.MINUTES.between(now, start);
+            if (timeDifference > 0 && timeDifference <= 15) {
+                upcomingAppointment.add(app);
+                within15 = true;
+            }
+
+            if (within15) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setContentText("The following meeting is within the next 15 minutes. ID: " + app.getAppointmentId() +
+                        " Start time: " + app.getStart() + " End Time " +
+                        app.getEnd() + " .");
+                alert.showAndWait();
+            }
         }
     }
 }

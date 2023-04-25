@@ -1,3 +1,8 @@
+/**
+ * The Appointment model is a class that contains all the required fields and methods for Appointment Objects
+ * */
+
+
 package model;
 
 import java.sql.Time;
@@ -25,19 +30,47 @@ public class Appointment {
     private String month;
 
 
-    // for month, type and total, Overload
+    /**
+     * Overload used retrieve month and type. This overload is used in the Reports controller
+     * @param month
+     * @param type
+     * @param total
+     */
     public Appointment(String month, String type, int total) {
         this.month = month;
         this.type = type;
         this.total = total;
     }
 
+    /**
+     * Overload used to retrieve customerId and meeting location. This Overload method is used in the reports' controller.
+     * @param customerId
+     * @param location
+     * @param total
+     */
     public Appointment(int customerId, String location, int total){
         this.customerId = customerId;
         this.location = location;
         this.total = total;
     }
 
+    /**
+     * Constructor
+     * @param appointmentId
+     * @param title
+     * @param description
+     * @param location
+     * @param type
+     * @param start
+     * @param end
+     * @param createDate
+     * @param createdBy
+     * @param lastUpdate
+     * @param lastUpdatedBy
+     * @param customerId
+     * @param userId
+     * @param contactId
+     */
     public Appointment(int appointmentId, String title, String description, String location, String type, LocalDateTime start,
                        LocalDateTime end, LocalDateTime createDate, String createdBy, Timestamp lastUpdate, String lastUpdatedBy,
                        int customerId, int userId, int contactId) {
@@ -57,6 +90,7 @@ public class Appointment {
         this.contactId = contactId;
     }
 
+    //Getters and setters
     public int getCustomerId() {
         return customerId;
     }
@@ -118,9 +152,6 @@ public class Appointment {
         return type;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
 
     public LocalDateTime getStart() {
         return start;
@@ -187,6 +218,10 @@ public class Appointment {
     }
 
 
+    /**
+     * This toString formats and returns a more decipherable String.
+     * @return
+     */
     @Override
     public String toString(){
         return "[" + appointmentId + "] " + title + " " + description + " " + location + " " + type + " " + start

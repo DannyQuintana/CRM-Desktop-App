@@ -1,9 +1,10 @@
+/**
+ * Manages the interaction between the database, view and models.
+ */
+
 package controller;
 
 import dao.*;
-import helper.DateTimeUtilities;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,30 +15,15 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import model.Appointment;
-import model.Contact;
-import model.Customer;
 import schedulingapp.c195advancejavaproject.Main;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Date;
-import java.sql.Timestamp;
 import java.time.*;
-import java.time.temporal.IsoFields;
 import java.time.temporal.WeekFields;
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
-    public TableColumn customerIdCol;
-    public TableColumn customerNameCol;
-    public TableColumn customerAddressCol;
-    public TableColumn customerPostalCol;
-    public TableColumn customerPhoneCol;
-    public TableView customerTable;
     public AnchorPane allAppointments;
     public TableView AppointmentTableView;
     public TableColumn appIDCol;
@@ -50,18 +36,28 @@ public class MainController implements Initializable {
     public TableColumn endDateTimeCol;
     public TableColumn customerIDCol;
     public TableColumn userIDCol;
-    @FXML
-    private Label welcomeText;
+    public Button closeBtn;
 
+    /**
+     * Loads and displays CustomerView
+     * @param actionEvent onclick
+     * @throws IOException
+     */
+    @FXML
     public void addCustomerClicked(ActionEvent actionEvent) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("addCustomer.fxml"));
         Stage stage = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
         Scene scene = new Scene(fxmlLoader.load(), 1000, 600);
-        stage.setTitle("Update Customer");
+        stage.setTitle("Customer");
         stage.setScene(scene);
         stage.show();
     }
 
+    /**
+     * Loads and displays Appointment view
+     * @param actionEvent onclick
+     * @throws IOException
+     */
     public void AppointmentsClicked(ActionEvent actionEvent) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("addAppointment.fxml"));
         Stage stage = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
@@ -73,6 +69,11 @@ public class MainController implements Initializable {
 
     }
 
+    /**
+     * Loads and displays reports view
+     * @param actionEvent onclick
+     * @throws IOException
+     */
     public void reportsClicked(ActionEvent actionEvent) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("reportView.fxml"));
         Stage stage = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
@@ -82,26 +83,11 @@ public class MainController implements Initializable {
         stage.show();
     }
 
-
-
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        AppointmentTableView.setItems(DBAppointment.getAllAppointments());
-
-        appIDCol.setCellValueFactory(new PropertyValueFactory<>("appointmentId"));
-        titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
-        descripCol.setCellValueFactory(new PropertyValueFactory<>("description"));
-        locationCol.setCellValueFactory(new PropertyValueFactory<>("location"));
-        contactCol.setCellValueFactory(new PropertyValueFactory<>("contactId"));
-        typeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
-        startDateTimeCol.setCellValueFactory(new PropertyValueFactory<>("start"));
-        endDateTimeCol.setCellValueFactory(new PropertyValueFactory<>("end"));
-        customerIDCol.setCellValueFactory(new PropertyValueFactory<>("customerId"));
-        userIDCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
-
-
-    }
-
+    /**
+     * Filters visible appointments on tableview.
+     * Compares week of year to current date and displays the appoitnments within current week of year.
+     * @param actionEvent select
+     */
     public void weekAppointmentClicked(ActionEvent actionEvent) {
 
         LocalDate date = LocalDate.now();
@@ -122,6 +108,11 @@ public class MainController implements Initializable {
 
     }
 
+    /**
+     * Filters visible appointments on tableview.
+     * Filters appointments to current month.
+     * @param actionEvent select
+     */
     public void monthAppointmentClicked(ActionEvent actionEvent) {
         LocalDate current = LocalDate.now();
 
@@ -141,6 +132,11 @@ public class MainController implements Initializable {
 
     }
 
+    /**
+     * Default view of appointments.
+     * All appointments displayed.
+     * @param actionEvent
+     */
     public void allAppointmentsClicked(ActionEvent actionEvent) {
         AppointmentTableView.setItems(DBAppointment.getAllAppointments());
 
@@ -157,4 +153,33 @@ public class MainController implements Initializable {
     }
 
 
+    /**
+     * Closes DBconnection and program.
+     * @param actionEvent
+     */
+    public void exitClicked(ActionEvent actionEvent) {
+        Stage exitBtn = (Stage) closeBtn.getScene().getWindow();
+        DBConnection.closeConnection();
+        exitBtn.close();
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        AppointmentTableView.setItems(DBAppointment.getAllAppointments());
+
+        appIDCol.setCellValueFactory(new PropertyValueFactory<>("appointmentId"));
+        titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
+        descripCol.setCellValueFactory(new PropertyValueFactory<>("description"));
+        locationCol.setCellValueFactory(new PropertyValueFactory<>("location"));
+        contactCol.setCellValueFactory(new PropertyValueFactory<>("contactId"));
+        typeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
+        startDateTimeCol.setCellValueFactory(new PropertyValueFactory<>("start"));
+        endDateTimeCol.setCellValueFactory(new PropertyValueFactory<>("end"));
+        customerIDCol.setCellValueFactory(new PropertyValueFactory<>("customerId"));
+        userIDCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
+
+
+    }
 }
+
+

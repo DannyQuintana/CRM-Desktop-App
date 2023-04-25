@@ -1,3 +1,7 @@
+/**
+ * Manages the interaction between the database, view and models.
+ */
+
 package controller;
 
 import dao.DBConnection;
@@ -34,6 +38,9 @@ public class LoginController implements Initializable {
     @FXML private TextField userNameField;
     @FXML private Label timeZoneLabel;
 
+    /**
+     * Retires users timezone and is displayed on the login menu.
+     */
     public void getTimeZone(){
         ZonedDateTime timeZone = ZonedDateTime.now();
         String result = timeZone.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.FULL));
@@ -41,6 +48,13 @@ public class LoginController implements Initializable {
 
 
     }
+
+    /**
+     * Validates user credentials and either rejects or accepts login.
+     * Compares username and password to stored information on the Database if accepted the main menu is accessed.
+     * Otherwise, an error message is displayed.
+     * @param actionEvent
+     */
     public void loginClicked(ActionEvent actionEvent) {
         try{
             String userName = userNameField.getText();
@@ -48,7 +62,7 @@ public class LoginController implements Initializable {
 
             Users user = DBUsers.authorizeUser(DBConnection.getConnection(),userName, password);
             if(user != null){
-                LoginTrackerUtility.loginActivity(LocalDateTime.now(), true);
+                LoginTrackerUtility.loginActivity(LocalDateTime.now(), true, userName);
                 System.out.println("Access granted");
                 FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("mainView.fxml"));
                 Stage stage = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
@@ -58,7 +72,7 @@ public class LoginController implements Initializable {
                 stage.show();
                 DateTimeUtilities.appointmentAlarm();
             } else {
-                LoginTrackerUtility.loginActivity(LocalDateTime.now(), false);
+                LoginTrackerUtility.loginActivity(LocalDateTime.now(), false , userName);
                 ResourceBundle bundle = ResourceBundle.getBundle("Login");
                 String errorMessage = bundle.getString("errorMessage");
                 Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -71,13 +85,21 @@ public class LoginController implements Initializable {
         }
     }
 
+    /**
+     * Resets user input.
+     * @param actionEvent
+     */
     public void resetClicked(ActionEvent actionEvent) {
         userNameField.setText("");
         passWordField.setText("");
     }
 
 
-
+    /**
+     * Loads resource bundle for French or English.
+     * @param url
+     * @param resourceBundle
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         ResourceBundle bundle = ResourceBundle.getBundle("Login", Locale.getDefault());

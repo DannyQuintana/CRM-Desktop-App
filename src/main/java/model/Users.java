@@ -1,3 +1,6 @@
+/**
+ * The Users model contains the fields and methods to be used for User objects.
+ */
 package model;
 
 import java.sql.Timestamp;
@@ -16,6 +19,16 @@ public class Users {
 
     }
 
+    /**
+     * Constructor
+     * @param userId
+     * @param name
+     * @param password
+     * @param createDate
+     * @param createdBy
+     * @param lastUpdate
+     * @param lastUpdatedBy
+     */
     public Users(int userId, String name, String password, LocalDateTime createDate, String createdBy, Timestamp lastUpdate, String lastUpdatedBy) {
         this.userId = userId;
         this.name = name;

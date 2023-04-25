@@ -1,3 +1,7 @@
+/**
+ * The Division model contains the fields and methods to be used for Division objects.
+ */
+
 package model;
 
 import java.sql.Timestamp;
@@ -15,6 +19,15 @@ public class Divisions {
     private int countryID;
     public Divisions(){}
 
+    /**Constructor
+     * @param divisionId
+     * @param division
+     * @param createDate
+     * @param createdBy
+     * @param lastUpdate
+     * @param lastUpdatedBy
+     * @param countryID
+     */
     public Divisions(int divisionId, String division, LocalDateTime createDate, String createdBy, Timestamp lastUpdate, String lastUpdatedBy, int countryID) {
         this.divisionId = divisionId;
         this.division = division;

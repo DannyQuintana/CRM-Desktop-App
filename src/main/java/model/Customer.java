@@ -1,8 +1,10 @@
+/**
+ * The Customer model contains the fields and methods to be used for Customers objects.
+ */
+
 package model;
 
-import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Customer {
@@ -21,6 +23,18 @@ public class Customer {
 
     public Customer(){}
 
+    /**Constructor
+     * @param customerId
+     * @param customerName
+     * @param address
+     * @param postalCode
+     * @param phone
+     * @param createDate
+     * @param createdBy
+     * @param lastUpdated
+     * @param lastUpdatedBy
+     * @param divisionId
+     */
     public Customer(int customerId, String customerName, String address, String postalCode, String phone, LocalDateTime createDate, String createdBy, Timestamp lastUpdated, String lastUpdatedBy, int divisionId) {
         this.customerId = customerId;
         this.customerName = customerName;
@@ -33,6 +47,8 @@ public class Customer {
         this.lastUpdatedBy = lastUpdatedBy;
         this.divisionId = divisionId;
     }
+
+    //Getters and Setters
 
     public int getDivisionId() {
         return divisionId;
@@ -116,6 +132,6 @@ public class Customer {
 
     @Override
     public String toString(){
-        return "ID " + customerId + ": " + customerName;
+        return "ID [" + customerId + "]: " + customerName;
     }
 }

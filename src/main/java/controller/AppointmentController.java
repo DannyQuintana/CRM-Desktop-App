@@ -1,3 +1,7 @@
+/**
+ * AppointmentController class manages the interaction between the database, view and models.
+ */
+
 package controller;
 
 import dao.DBAppointment;
@@ -54,6 +58,12 @@ public class AppointmentController implements Initializable {
     public TableView<Appointment> AppointmentTableView;
 
 
+    /**
+     * Retrieves and populates table view by retrieving database information.
+     * Lambda expression - prevents users form picking past dates.
+     * @param url
+     * @param resourceBundle
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         //Setting Table view
@@ -92,10 +102,22 @@ public class AppointmentController implements Initializable {
             endTimeBox.getItems().add(endStart);
             endStart = endStart.plusMinutes(15);
         }
+
+        //Lambda Expression prevents selecting past dates.
+        datePickerBox.setDayCellFactory(selected -> new DateCell() {
+            public void updateItem(LocalDate date, boolean check) {
+                setDisable(
+                        check || date.isBefore(LocalDate.now()));
+            }
+        });
     }
 
-
-    //methods
+    /**
+     * Parses the user input, converts date and times to LocalDateTime objects, and conducts validation checking on inputted information.
+     * Uses a sequence of If else statements, and calls the checkAppointmentOverlap() method and checkIfESTHours() method.
+     * If all checks are passed the method calls the DBAppointment.addAppointment() method to create an entry.
+     * @param actionEvent
+     */
     public void submitAppointmentClicked(ActionEvent actionEvent) {
         String title = appTitleField.getText();
         String description = descriptionField.getText();
@@ -115,6 +137,7 @@ public class AppointmentController implements Initializable {
 
         int customer = customerIDBox.getSelectionModel().getSelectedItem().getCustomerId();
         int user = userIDBox.getSelectionModel().getSelectedItem().getUserId();
+
             if (title.isBlank() || description.isBlank() || location.isBlank() || type.isBlank()) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setContentText("Fields can not be left blank, please check the form to ensure all fields have values.");
@@ -149,6 +172,12 @@ public class AppointmentController implements Initializable {
             }
     }
 
+    /**
+     * Parses the user input, converts date and times to LocalDateTime objects, and conducts validation checking on inputted information.
+     * Uses a sequence of If else statements, and calls the checkAppointmentOverlap() method and checkIfESTHours() method.
+     * If all checks pass the DBAppointment.updateAppointment() method is called to modify entry.
+     * @param actionEvent
+     */
     public void upDateClicked(ActionEvent actionEvent) {
         int id = Integer.parseInt(appIDField.getText());
         String title = appTitleField.getText();
@@ -160,35 +189,55 @@ public class AppointmentController implements Initializable {
         LocalTime start = startTimeBox.getSelectionModel().getSelectedItem();
         LocalTime end = endTimeBox.getSelectionModel().getSelectedItem();
 
-        LocalDateTime startDateTime = DateTimeUtilities.convertToUTC(date, start);
-        LocalDateTime endDateTime = DateTimeUtilities.convertToUTC(date, end);
+        LocalDateTime startDateTime = LocalDateTime.of(date, start);
+        LocalDateTime endDateTime = LocalDateTime.of(date, end);
 
         int customerId = customerIDBox.getSelectionModel().getSelectedItem().getCustomerId();
         int userId = userIDBox.getSelectionModel().getSelectedItem().getUserId();
         int contactId = contactBox.getSelectionModel().getSelectedItem().getContactId();
 
-        boolean overlapConfirm = checkAppointmentOverlap(customerId,startDateTime, endDateTime);
-        boolean checkBusinessHours = checkIfESTHours(startDateTime, endDateTime, date);
 
-        if(overlapConfirm && !checkBusinessHours) {
-            DBAppointment.updateAppointment(id, title, description, location, type, startDateTime, endDateTime, customerId, userId, contactId);
-            AppointmentTableView.setItems(DBAppointment.getAllAppointments());
-            clearAllFields();
-        } else if (!overlapConfirm) {
+        if (title.isBlank() || description.isBlank() || location.isBlank() || type.isBlank()) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText("Overlapping Appointments, please select another time");
+            alert.setContentText("Fields can not be left blank, please check the form to ensure all fields have values.");
             alert.showAndWait();
-        }else {
+        } else if (startDateTime.isAfter(endDateTime)) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText("Business Hours must be between 8:00am to 10:00pm EST Monday to Friday, please select another Date or time");
+            alert.setContentText("Start time needs to be before end time.");
             alert.showAndWait();
+        } else if (endDateTime.isBefore(startDateTime)) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText("End time must be greater than start time.");
+            alert.showAndWait();
+        } else if (startDateTime.isEqual(endDateTime)) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText("Start and End time can not be equal");
+            alert.showAndWait();
+        } else {
+
+            if (checkAppointmentOverlapUpdate(customerId, startDateTime, endDateTime) && checkIfESTHours(startDateTime, endDateTime, date)) {
+                DBAppointment.updateAppointment(id, title, description, location, type, DateTimeUtilities.convertToUTC(startDateTime), DateTimeUtilities.convertToUTC(endDateTime), customerId, userId, contactId);
+                AppointmentTableView.setItems(DBAppointment.getAllAppointments());
+                clearAllFields();
+            } else if (!checkIfESTHours(startDateTime, endDateTime, date)) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setContentText("The selected time are outside of Business hours. The business hours must be between 8:00am to 10:00pm EST Monday to Friday");
+                alert.showAndWait();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setContentText("Customer is already scheduled for another appointment between the selected times: " + startDateTime + " and " + endDateTime + ". Please Select another time.");
+                alert.showAndWait();
+            }
         }
     }
 
 
-
+    /**
+     * Populates the text-fields, combo-boxes and date picker with selected appointment from the AppointmentTableView.
+     * @param actionEvent
+     */
     public void updateAppointment(ActionEvent actionEvent) {
-        Appointment pickedAppointment = (Appointment) AppointmentTableView.getSelectionModel().getSelectedItem();
+        Appointment pickedAppointment = AppointmentTableView.getSelectionModel().getSelectedItem();
 
         if (pickedAppointment != null) {
 
@@ -210,9 +259,15 @@ public class AppointmentController implements Initializable {
     }
 
 
-
+    /**
+     * Deletes selected appointment from the database.
+     * If selection is not null, the appointment ID is parsed and converted to an int. After validation and confirmation
+     * the int is passed as an argument to the DBAppointment.deleteAppointment() method. The table view items are set
+     * to show updated results.
+     * @param actionEvent
+     */
     public void deleteCustomer(ActionEvent actionEvent) {
-        Appointment selectedAppointment = (Appointment) AppointmentTableView.getSelectionModel().getSelectedItem();
+        Appointment selectedAppointment =AppointmentTableView.getSelectionModel().getSelectedItem();
 
         if (selectedAppointment == null) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -234,6 +289,11 @@ public class AppointmentController implements Initializable {
         }
     }
 
+    /**
+     * Returns to main menu
+     * @param actionEvent
+     * @throws IOException
+     */
     public void toMaineMenu(ActionEvent actionEvent) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("mainView.fxml"));
         Stage stage = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();
@@ -241,6 +301,7 @@ public class AppointmentController implements Initializable {
         stage.setTitle("Main Menu");
         stage.setScene(scene);
         stage.show();
+        DateTimeUtilities.appointmentAlarmMenuReturn();
     }
 
     public void clearClicked(ActionEvent actionEvent) {
@@ -266,6 +327,16 @@ public class AppointmentController implements Initializable {
     }
 
 
+    /**
+     * Checks that proposed date and time are within the appropriate business hours.
+     * First business hours are set as a two LocalDateTime objects, then the proposedStart and proposedEnd are converted
+     * to EST. two additional DayOfWeek objects with the values of Saturday and Sunday are created.
+     * From there comparisions are made between the proposed times and business hours. Day of week is also checked.
+     * @param proposedStart
+     * @param proposedEnd
+     * @param date
+     * @return boolean
+     */
     private boolean checkIfESTHours(LocalDateTime proposedStart, LocalDateTime proposedEnd, LocalDate date){
         //First we will create the hours parameters of 8:00am to 10:00pm EST Time
         LocalDateTime openBusinessHours = LocalDateTime.of(date, LocalTime.of(8, 0));
@@ -280,17 +351,64 @@ public class AppointmentController implements Initializable {
         DayOfWeek sunday = DayOfWeek.SUNDAY;
 
         //next Compare the business hours to the start and end
-        if(proposedStart.isBefore(openBusinessHours) || proposedStart.isAfter(closedBusinessHours) || (date.getDayOfWeek() == saturday || date.getDayOfWeek() == sunday)){
-            return false;
-        } else {
-            return !proposedEnd.isBefore(openBusinessHours) && !proposedEnd.isAfter(closedBusinessHours);
-        }
+        return !proposedStart.isBefore(openBusinessHours) && !proposedStart.isAfter(closedBusinessHours) &&
+                !proposedEnd.isBefore(openBusinessHours) && !proposedEnd.isAfter(closedBusinessHours) &&
+                (date.getDayOfWeek() != saturday && date.getDayOfWeek() != sunday);
     }
 
+    /**
+     * Checks to ensure no other appointments with the same customers are overlapping.
+     * A list of customer appointments are made, and are filtered down to only the appointments that have the same customerID.
+     * From there a loop occurs to check each item in the List and compare the proposed times and the items time.
+     * @param customerId
+     * @param proposedStart
+     * @param proposedEnd
+     * @return
+     */
     private boolean checkAppointmentOverlap(int customerId ,LocalDateTime proposedStart, LocalDateTime proposedEnd) {
         //Create a list of each appointment that a customer is attached too. The customer ID variable will come from the combo box.
         ObservableList<Appointment> customerAppList = DBAppointment.getAppointmentByCustomerId(customerId);
-        System.out.println(customerAppList);
+
+
+        //Check if List is empty. If the list has items we need toLoop through each item and compare the start and end times to the proposedStart and endTimes.
+
+            for (Appointment app : customerAppList) {
+                LocalDateTime startTime = app.getStart();
+                LocalDateTime endTime = app.getEnd();
+                System.out.println("Start Time:" + startTime);
+                System.out.println("End Time: " + endTime);
+
+
+                    //If startTime is before or equal (proposed >= start AND start < End)
+                    if ((proposedStart.isAfter(startTime) || proposedStart.isEqual(startTime)) && proposedStart.isBefore(endTime)) {
+                        return false;
+                    }
+                    //proposed end is After the start time but is before the end of the meeting
+                    if (proposedEnd.isAfter(startTime) && (proposedEnd.isBefore(endTime) || proposedEnd.isEqual(endTime))) {
+                        return false;
+                    }
+                    //proposed time is before and after the start time
+                    if ((proposedStart.isBefore(startTime) || proposedStart.isEqual(startTime)) && (proposedEnd.isAfter(endTime) || proposedEnd.isEqual(endTime))) {
+                        return false;
+                    }
+                }
+
+        return true;
+    }
+
+    /**
+     * Checks to ensure no other appointments with the same customers are overlapping while avoiding checking self.
+     * A list of customer appointments are made, and are filtered down to only the appointments that have the same customerID.
+     * From there a loop occurs to check each item in the List and compare the proposed times and the items time.
+     * @param customerId
+     * @param proposedStart
+     * @param proposedEnd
+     * @return boolean
+     */
+    private boolean checkAppointmentOverlapUpdate(int customerId ,LocalDateTime proposedStart, LocalDateTime proposedEnd) {
+        //Create a list of each appointment that a customer is attached too. The customer ID variable will come from the combo box.
+        ObservableList<Appointment> customerAppList = DBAppointment.getAppointmentByCustomerId(customerId);
+        int id = Integer.parseInt(appIDField.getText());
 
         //Check if List is empty. If the list has items we need toLoop through each item and compare the start and end times to the proposedStart and endTimes.
         if(!customerAppList.isEmpty()) {
@@ -300,20 +418,22 @@ public class AppointmentController implements Initializable {
                 System.out.println("Start Time:" + startTime);
                 System.out.println("End Time: " + endTime);
 
-                //If startTime is before or equal (proposed >= start AND start < End)
-                if( (proposedStart.isAfter(startTime) || proposedStart.isEqual(startTime)) && proposedStart.isBefore(endTime)) {
-                    return false;
-                }
-                //proposed end is After the start time but is before the end of the meeting
-                if(proposedEnd.isAfter(startTime) && (proposedEnd.isBefore(endTime) || proposedEnd.isEqual(endTime)) ){
-                    return false;
-                }
-                //proposed time is before and after the start time
-                if((proposedStart.isBefore(startTime) || proposedStart.isEqual(startTime)) && (proposedEnd.isAfter(endTime) || proposedEnd.isEqual(endTime))){
-                    return false;
+                if (id != app.getAppointmentId()) {
+                    //If startTime is before or equal (proposed >= start AND start < End)
+                    if ((proposedStart.isAfter(startTime) || proposedStart.isEqual(startTime)) && proposedStart.isBefore(endTime)) {
+                        return false;
+                    }
+                    //proposed end is After the start time but is before the end of the meeting
+                    if (proposedEnd.isAfter(startTime) && (proposedEnd.isBefore(endTime) || proposedEnd.isEqual(endTime))) {
+                        return false;
+                    }
+                    //proposed time is before and after the start time
+                    if ((proposedStart.isBefore(startTime) || proposedStart.isEqual(startTime)) && (proposedEnd.isAfter(endTime) || proposedEnd.isEqual(endTime))) {
+                        return false;
+                    }
                 }
             }
-        }
+            }
         return true;
     }
 

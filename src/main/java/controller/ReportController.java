@@ -2,6 +2,7 @@ package controller;
 
 import dao.DBAppointment;
 import dao.DBContact;
+import helper.DateTimeUtilities;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -83,5 +84,6 @@ public class ReportController implements Initializable{
         stage.setTitle("Main Menu");
         stage.setScene(scene);
         stage.show();
+        DateTimeUtilities.appointmentAlarmMenuReturn();
     }
 }

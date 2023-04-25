@@ -1,3 +1,7 @@
+/**
+ * The Contact model contains the fields and methods to be used for Contact objects.
+ */
+
 package model;
 
 public class Contact {
@@ -7,6 +11,12 @@ public class Contact {
 
     public Contact(){}
 
+    /**
+     * Constructor
+     * @param contactId
+     * @param contactName
+     * @param email
+     */
     public Contact(int contactId, String contactName, String email){
         this.contactId = contactId;
         this.contactName = contactName;

@@ -37,10 +37,10 @@
                 <TableColumn fx:id="divisionID" prefWidth="79.0" text="Division ID" />
             </columns>
         </TableView>
-        <Button layoutX="445.0" layoutY="499.0" mnemonicParsing="false" onAction="#updateCustomerClicked" text="Update Customer" />
         <Button layoutX="618.0" layoutY="499.0" mnemonicParsing="false" onAction="#deleteCustomer" text="Delete Customer" />
       <Button layoutX="798.0" layoutY="499.0" mnemonicParsing="false" onAction="#toMaineMenu" prefHeight="25.0" prefWidth="97.0" text="Main Menu" />
       <Button layoutX="263.0" layoutY="449.0" mnemonicParsing="false" onAction="#clearFields" text="Clear" />
       <Button fx:id="upDateButton" disable="true" layoutX="176.0" layoutY="449.0" mnemonicParsing="false" onAction="#upDateClicked" text="Update" />
+      <Label layoutX="394.0" layoutY="47.0" text="Select a customer below to modify information." />
     </children>
 </AnchorPane>
