@@ -77,6 +77,9 @@ public class DateTimeUtilities {
                 }
             }
 
+    /**
+     * Shows an alarm when returning to menu
+     */
     public static void appointmentAlarmMenuReturn(){
         ObservableList<Appointment> upcomingAppointment = FXCollections.observableArrayList();
         boolean within15 = false;

@@ -1,5 +1,10 @@
+/**
+ * Provides CRUD operations for divisions tables.
+ */
+
 package dao;
 
+import dao.DBConnection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Customer;
@@ -11,40 +16,11 @@ import java.util.Objects;
 
 public class DBDivisions {
 
-    public static ObservableList<Divisions> getAllDivisions(){
-
-        ObservableList<Divisions> divisionsList = FXCollections.observableArrayList();
-
-        try {
-            String sql = "SELECT * FROM first_level_divisions";
-            PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
-
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()){
-                int id = rs.getInt("Division_ID");
-                String name = rs.getString("Division");
-
-                Timestamp createDate = rs.getTimestamp("Create_Date");
-                LocalDateTime createDateTime = createDate.toLocalDateTime();
-
-                String createdBy = rs.getString("Created_By");
-                Timestamp last_update = rs.getTimestamp("Last_Update");
-                String lastUpdatedBy = rs.getString("Last_Updated_By");
-                int countryId = rs.getInt("Country_ID");
-
-                Divisions d = new Divisions(id, name, createDateTime, createdBy, last_update, lastUpdatedBy, countryId);
-
-                divisionsList.add(d);
-            }
-
-        } catch (SQLException e){
-            e.printStackTrace();
-        }
-
-        return divisionsList;
-    }
-
+    /**
+     * Returns a division by ID.
+     * @param divisionID
+     * @return
+     */
     public static int getDivision(int divisionID){
 
         try {
@@ -59,7 +35,10 @@ public class DBDivisions {
         return divisionID;
     }
 
-
+    /**
+     * Returns filtered list of divisions depending on Coutnry ID
+     * @return
+     */
     public static ObservableList<Divisions> getAllUSA(){
 
         ObservableList<Divisions> divisionsList = FXCollections.observableArrayList();
@@ -94,7 +73,10 @@ public class DBDivisions {
         return divisionsList;
     }
 
-
+    /**
+     * Returns filtered list of divisions depending on Coutnry ID
+     * @return
+     */
     public static ObservableList<Divisions> getAllUK(){
 
         ObservableList<Divisions> divisionsList = FXCollections.observableArrayList();
@@ -129,6 +111,10 @@ public class DBDivisions {
         return divisionsList;
     }
 
+    /**
+     * Returns filtered list of divisions depending on Coutnry ID
+     * @return
+     */
     public static ObservableList<Divisions> getAllCA(){
 
         ObservableList<Divisions> divisionsList = FXCollections.observableArrayList();

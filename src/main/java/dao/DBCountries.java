@@ -1,9 +1,12 @@
+/**
+ * Provides CRUD operations for the Countries mySQL Table.
+ */
+
 package dao;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Countries;
-import model.Divisions;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,6 +16,11 @@ import java.time.LocalDateTime;
 
 public class DBCountries {
 
+
+    /**
+     * Returns a list of countries.
+     * @return
+     */
     public static ObservableList<Countries> getAllCountries(){
         ObservableList<Countries> countriesList = FXCollections.observableArrayList();
 
@@ -42,6 +50,12 @@ public class DBCountries {
         }
         return countriesList;
     }
+
+    /**
+     * Returns a country record by countryID
+     * @param countryID
+     * @return
+     */
 
     public static int getCountry(int countryID) {
 

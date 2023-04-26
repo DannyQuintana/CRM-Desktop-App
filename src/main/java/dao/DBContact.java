@@ -1,5 +1,10 @@
+/**
+ * Provides CRUD operations for the Customers mySQL Table.
+ */
+
 package dao;
 
+import dao.DBConnection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Contact;
@@ -10,7 +15,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class DBContact {
-
+    /**
+     * Returns a list of all contacts.
+     * @return
+     */
     public static ObservableList<Contact> getAllContacts (){
         ObservableList<Contact> contactList = FXCollections.observableArrayList();
 
@@ -35,6 +43,11 @@ public class DBContact {
         return contactList;
     }
 
+    /**
+     * Returns a contact record by ID.
+     * @param contactID
+     * @return
+     */
 
     public static int getContact(int contactID) {
 

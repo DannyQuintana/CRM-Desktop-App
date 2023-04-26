@@ -1,5 +1,9 @@
+/**
+ * Provides CRUD operations for the customer mySQL table.
+ */
 package dao;
 
+import dao.DBConnection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
@@ -19,6 +23,10 @@ import static dao.DBConnection.openConnection;
 
 public class DBCustomer  {
 
+    /**
+     * Returns a list of customers.
+     * @return
+     */
     public static ObservableList<Customer> getAllCustomers(){
 
         ObservableList<Customer> customerList = FXCollections.observableArrayList();
@@ -58,27 +66,14 @@ public class DBCustomer  {
         return customerList;
     }
 
-
-    public static String getCustomersName(long ID){
-
-        ObservableList<Customer> customerList = FXCollections.observableArrayList();
-        String name = "";
-
-        try {
-            String sql = "SELECT Customer_Name FROM customers WHERE Customer_ID = ?";
-            PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
-            ps.setLong(1, ID);
-
-            ResultSet rs = ps.executeQuery();
-            name = rs.toString();
-
-        } catch (SQLException e){
-            e.printStackTrace();
-        }
-        return name;
-    }
-
-
+    /**
+     * Creates a record on the customers table.
+     * @param name
+     * @param address
+     * @param postalCode
+     * @param phone
+     * @param divisionID
+     */
     public static void addCustomer(String name, String address, String postalCode, String phone, int divisionID){
 
         Timestamp createDate = Timestamp.valueOf(LocalDateTime.now());
@@ -99,6 +94,15 @@ public class DBCustomer  {
         }
     }
 
+    /**
+     * Updates a record on the customers table.
+     * @param id
+     * @param name
+     * @param address
+     * @param postalCode
+     * @param phone
+     * @param divisionID
+     */
     public static void updateCustomer(int id, String name, String address, String postalCode, String phone, int divisionID){
 
         Timestamp lastUpdate = Timestamp.valueOf(LocalDateTime.now());
@@ -127,7 +131,10 @@ public class DBCustomer  {
     }
 
 
-
+    /**
+     * Deletes a customer record by ID.
+     * @param ID
+     */
     public static void deleteCustomer(int ID){
 
         try {
@@ -144,6 +151,11 @@ public class DBCustomer  {
 
     }
 
+    /**
+     * Returns a customer record by customerID.
+     * @param customerID
+     * @return
+     */
     public static int getCustomer(int customerID) {
         try {
             String sql = "SELECT Customer_ID FROM appointments WHERE Customer_ID = ?";

@@ -1,3 +1,7 @@
+/**
+ * Abstract class that provides the initial DB connection.
+ */
+
 package dao;
 
 import java.sql.Connection;
@@ -15,6 +19,9 @@ public abstract class DBConnection {
     private static String password = "Passw0rd!"; // Password
     public static Connection connection;  // Connection Interface
 
+    /**
+     * Opens Database connection. Allows communication between application and mySQL database.
+     */
     public static void openConnection()
     {
         try {
@@ -28,10 +35,17 @@ public abstract class DBConnection {
         }
     }
 
+    /**
+     * Method that returns openConnection.
+     * @return
+     */
     public static Connection getConnection(){
         return connection;
     }
 
+    /**
+     * Closes connection to mySQL database.
+     */
     public static void closeConnection() {
         try {
             connection.close();

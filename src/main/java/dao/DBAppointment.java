@@ -1,17 +1,23 @@
+/**
+ * Provides CRUD operations for the appointments mySQL table.
+ */
+
 package dao;
 
 import helper.DateTimeUtilities;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.util.converter.LocalDateStringConverter;
 import model.Appointment;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class DBAppointment {
 
+    /**
+     * Returns a List of appointments.
+     * @return ObservableList Appointment
+     */
     public static ObservableList<Appointment> getAllAppointments(){
 
         ObservableList<Appointment> appointmentList = FXCollections.observableArrayList();
@@ -61,7 +67,11 @@ public class DBAppointment {
         return appointmentList;
     }
 
-
+    /**
+     * Filters appointments collection by months.
+     * @param month int
+     * @return ObservableList
+     */
     public static ObservableList<Appointment> getMonthAppointments(int month){
 
         ObservableList<Appointment> appointmentList = FXCollections.observableArrayList();
@@ -112,6 +122,11 @@ public class DBAppointment {
         return appointmentList;
     }
 
+    /**
+     * Filters Filters appointments collection by week
+     * @param week int
+     * @return ObservableList
+     */
     public static ObservableList<Appointment> getWeekAppointments(int week){
 
         ObservableList<Appointment> appointmentList = FXCollections.observableArrayList();
@@ -163,6 +178,18 @@ public class DBAppointment {
         return appointmentList;
     }
 
+    /**
+     * Create a appointment record.
+     * @param title String
+     * @param description String
+     * @param location String
+     * @param type String
+     * @param start LocalDateTime
+     * @param end LocalDateTime
+     * @param customerID int
+     * @param userID int
+     * @param contactID int
+     */
     public static void addAppointment(String title, String description, String location, String type, LocalDateTime start, LocalDateTime end, int customerID, int userID,  int contactID){
 
         Timestamp createDate = Timestamp.valueOf(LocalDateTime.now());
@@ -183,6 +210,10 @@ public class DBAppointment {
         }
     }
 
+    /**
+     * Deletes appointment by Appointment ID number.
+     * @param ID int
+     */
     public static void deleteAppointment(int ID) {
         try {
             if (ID > 0) {
@@ -197,6 +228,19 @@ public class DBAppointment {
         }
     }
 
+    /**
+     * Updates existing appointment record.
+     * @param appID int
+     * @param title String
+     * @param description String
+     * @param location String
+     * @param type String
+     * @param start LocalDateTime
+     * @param end LocalDateTime
+     * @param customerID int
+     * @param userID int
+     * @param contactID int
+     */
     public static void updateAppointment(int appID, String title, String description, String location, String type, LocalDateTime start, LocalDateTime end, int customerID, int userID,  int contactID){
         try{
             String sql = "UPDATE appointments SET Title = ?, Description = ?, Type = ?, Start = ?, End= ?, Customer_ID = ?, User_ID =?, Contact_ID = ? Where Appointment_ID = ?";
@@ -221,6 +265,11 @@ public class DBAppointment {
 
     }
 
+    /**
+     * Filters appointments by customer ID
+     * @param customerId
+     * @return
+     */
     public static ObservableList<Appointment> getAppointmentByCustomerId(int customerId) {
         ObservableList<Appointment> appointmentList = FXCollections.observableArrayList();
 
@@ -268,10 +317,10 @@ public class DBAppointment {
         return appointmentList;
     }
 
-    //Report method
-    //Need to capture
-    //SELECT Type, COUNT(Type) FROM client_schedule.appointments GROUP BY Type
-    //SELECT MONTHNAME(Start) as "Month", count(Start) as "Total" FROM  client_schedule.appointments GROUP BY Month;
+    /**
+     * Returns a filtered table that includes Month and Appointment type. The count() is used to see number of occurrences.
+     * @return ObservableList Appointment
+     */
     public static ObservableList<Appointment> getTypeMonthReport(){
 
         ObservableList<Appointment> typeMonthReportList = FXCollections.observableArrayList();
@@ -298,6 +347,10 @@ public class DBAppointment {
         return typeMonthReportList;
     }
 
+    /**
+     * Returns a filtered table that counts the number of occurrences of appointment Location by CustomerID.
+     * @return ObservableList
+     */
     public static ObservableList<Appointment> getAppLocationReport(){
 
         ObservableList<Appointment> appLocationReportList = FXCollections.observableArrayList();
@@ -324,6 +377,11 @@ public class DBAppointment {
         return appLocationReportList;
     }
 
+    /**
+     * Returns a filtered List of appointments by contactID
+     * @param contactID
+     * @return
+     */
     public static ObservableList<Appointment> getAppointmentByContactId(int contactID) {
         ObservableList<Appointment> appointmentList = FXCollections.observableArrayList();
 
