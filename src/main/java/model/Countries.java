@@ -1,12 +1,11 @@
-/**
- * The Countries model contains the fields and methods to be used for Countries objects.
- */
-
 package model;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
+/**
+ * The Countries model contains the fields and methods to be used for Countries objects.
+ */
 public class Countries {
     private int countryId;
     private String country;
@@ -19,12 +18,12 @@ public class Countries {
 
     /**
      * Constructor
-     * @param countryId
-     * @param country
-     * @param createDate
-     * @param createdBy
-     * @param lastUpdated
-     * @param lastUpdatedBy
+     * @param countryId country ID
+     * @param country country name
+     * @param createDate country created on date
+     * @param createdBy country created by
+     * @param lastUpdated country last updated by date
+     * @param lastUpdatedBy country last updated by user
      */
     public Countries(int countryId, String country, LocalDateTime createDate, String createdBy, Timestamp lastUpdated, String lastUpdatedBy) {
         this.countryId = countryId;

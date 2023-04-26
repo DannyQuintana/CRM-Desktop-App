@@ -1,7 +1,3 @@
-/**
- * AppointmentController class manages the interaction between the database, view and models.
- */
-
 package controller;
 
 import dao.DBAppointment;
@@ -31,6 +27,9 @@ import java.time.*;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+/**
+ * AppointmentController class manages the interaction between the database, view and models.
+ */
 public class AppointmentController implements Initializable {
     public TextField appIDField;
     public TextField appTitleField;
@@ -59,10 +58,9 @@ public class AppointmentController implements Initializable {
 
 
     /**
-     * Retrieves and populates table view by retrieving database information.
+     * Retrieves and populates table view.
+     * Retrieves data from Appointment Table
      * Lambda expression - prevents users form picking past dates.
-     * @param url
-     * @param resourceBundle
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -113,10 +111,9 @@ public class AppointmentController implements Initializable {
     }
 
     /**
-     * Parses the user input, converts date and times to LocalDateTime objects, and conducts validation checking on inputted information.
-     * Uses a sequence of If else statements, and calls the checkAppointmentOverlap() method and checkIfESTHours() method.
-     * If all checks are passed the method calls the DBAppointment.addAppointment() method to create an entry.
-     * @param actionEvent
+     * Creates a new appointment record.
+     * Validates user input then calls DBAppointment.addAppointment method.
+     * @param actionEvent Creates appointment record on click
      */
     public void submitAppointmentClicked(ActionEvent actionEvent) {
         String title = appTitleField.getText();
@@ -138,11 +135,13 @@ public class AppointmentController implements Initializable {
         int customer = customerIDBox.getSelectionModel().getSelectedItem().getCustomerId();
         int user = userIDBox.getSelectionModel().getSelectedItem().getUserId();
 
-            if (title.isBlank() || description.isBlank() || location.isBlank() || type.isBlank()) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setContentText("Fields can not be left blank, please check the form to ensure all fields have values.");
-                alert.showAndWait();
-            } else if (startDateTime.isAfter(endDateTime)) {
+        if (title.isBlank() || description.isBlank() || location.isBlank() || type.isBlank() || datePickerBox.getValue() == null ||
+                startTimeBox.getSelectionModel().isEmpty() || endTimeBox.getSelectionModel().isEmpty() ||
+                customerIDBox.getSelectionModel().isEmpty() || userIDBox.getSelectionModel().isEmpty() || contactBox.getSelectionModel().isEmpty()){
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText("Fields can not be left blank, please check the form to ensure all fields have values.");
+            alert.showAndWait();
+        }else if (startDateTime.isAfter(endDateTime)) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setContentText("Start time needs to be before end time.");
                 alert.showAndWait();
@@ -173,10 +172,9 @@ public class AppointmentController implements Initializable {
     }
 
     /**
-     * Parses the user input, converts date and times to LocalDateTime objects, and conducts validation checking on inputted information.
-     * Uses a sequence of If else statements, and calls the checkAppointmentOverlap() method and checkIfESTHours() method.
-     * If all checks pass the DBAppointment.updateAppointment() method is called to modify entry.
-     * @param actionEvent
+     * Updates appointment record.
+     * Validates user input then calls DBAppointment.updateAppointment method
+     * @param actionEvent updates appointment record on click
      */
     public void upDateClicked(ActionEvent actionEvent) {
         int id = Integer.parseInt(appIDField.getText());
@@ -197,7 +195,9 @@ public class AppointmentController implements Initializable {
         int contactId = contactBox.getSelectionModel().getSelectedItem().getContactId();
 
 
-        if (title.isBlank() || description.isBlank() || location.isBlank() || type.isBlank()) {
+        if (title.isBlank() || description.isBlank() || location.isBlank() || type.isBlank() || datePickerBox.getValue() == null ||
+        startTimeBox.getSelectionModel().isEmpty() || endTimeBox.getSelectionModel().isEmpty() ||
+        customerIDBox.getSelectionModel().isEmpty() || userIDBox.getSelectionModel().isEmpty() || contactBox.getSelectionModel().isEmpty()){
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setContentText("Fields can not be left blank, please check the form to ensure all fields have values.");
             alert.showAndWait();
@@ -233,8 +233,8 @@ public class AppointmentController implements Initializable {
 
 
     /**
-     * Populates the text-fields, combo-boxes and date picker with selected appointment from the AppointmentTableView.
-     * @param actionEvent
+     * Populates text fields with selected appointment.
+     * @param actionEvent populates fields on click.
      */
     public void updateAppointment(ActionEvent actionEvent) {
         Appointment pickedAppointment = AppointmentTableView.getSelectionModel().getSelectedItem();
@@ -260,11 +260,8 @@ public class AppointmentController implements Initializable {
 
 
     /**
-     * Deletes selected appointment from the database.
-     * If selection is not null, the appointment ID is parsed and converted to an int. After validation and confirmation
-     * the int is passed as an argument to the DBAppointment.deleteAppointment() method. The table view items are set
-     * to show updated results.
-     * @param actionEvent
+     * Deletes selected appointment record from Appointment table.
+     * @param actionEvent deletes appointment record on click.
      */
     public void deleteCustomer(ActionEvent actionEvent) {
         Appointment selectedAppointment =AppointmentTableView.getSelectionModel().getSelectedItem();
@@ -274,25 +271,27 @@ public class AppointmentController implements Initializable {
             alert.setContentText("No appointment selected");
             alert.showAndWait();
         } else {
-            String toString = String.valueOf(AppointmentTableView.getSelectionModel().getSelectedItem());
-            String parseID = toString.substring(toString.indexOf('[') + 1, toString.indexOf(']'));
-            int appointmentID = Integer.parseInt(parseID);
+                int appointmentID = selectedAppointment.getAppointmentId();
 
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setContentText("Are you sure you want to delete appointment entry?");
-            Optional<ButtonType> select = alert.showAndWait();
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setContentText("Are you sure you want to delete appointment entry?");
+                Optional<ButtonType> select = alert.showAndWait();
 
             if (select.get() == ButtonType.OK) {
                 DBAppointment.deleteAppointment(appointmentID);
+                Alert alert1 = new Alert(Alert.AlertType.INFORMATION);
+                alert1.setContentText("Appointment: " + appointmentID + " with type of " + selectedAppointment.getType() + " has been canceled." );
+                alert1.showAndWait();
                 AppointmentTableView.setItems(DBAppointment.getAllAppointments());
+
             }
         }
     }
 
     /**
      * Returns to main menu
-     * @param actionEvent
-     * @throws IOException
+     * @param actionEvent returns to main menu on click
+     * @throws IOException if resource cannot be found.
      */
     public void toMaineMenu(ActionEvent actionEvent) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("mainView.fxml"));
@@ -326,44 +325,51 @@ public class AppointmentController implements Initializable {
         userIDBox.valueProperty().setValue(null);
     }
 
-
-    /**
-     * Checks that proposed date and time are within the appropriate business hours.
-     * First business hours are set as a two LocalDateTime objects, then the proposedStart and proposedEnd are converted
-     * to EST. two additional DayOfWeek objects with the values of Saturday and Sunday are created.
-     * From there comparisions are made between the proposed times and business hours. Day of week is also checked.
-     * @param proposedStart
-     * @param proposedEnd
-     * @param date
-     * @return boolean
-     */
-    private boolean checkIfESTHours(LocalDateTime proposedStart, LocalDateTime proposedEnd, LocalDate date){
-        //First we will create the hours parameters of 8:00am to 10:00pm EST Time
-        LocalDateTime openBusinessHours = LocalDateTime.of(date, LocalTime.of(8, 0));
-        LocalDateTime closedBusinessHours = LocalDateTime.of(date, LocalTime.of(22, 0));
-
-        //Next convert the proposedStart and ProposedEnd to EST time
-        proposedStart.atZone(ZoneId.of("America/New_York"));
-        proposedEnd.atZone(ZoneId.of("America/New_York"));
-
-        //Defining work week
-        DayOfWeek saturday = DayOfWeek.SATURDAY;
-        DayOfWeek sunday = DayOfWeek.SUNDAY;
-
-        //next Compare the business hours to the start and end
-        return !proposedStart.isBefore(openBusinessHours) && !proposedStart.isAfter(closedBusinessHours) &&
-                !proposedEnd.isBefore(openBusinessHours) && !proposedEnd.isAfter(closedBusinessHours) &&
-                (date.getDayOfWeek() != saturday && date.getDayOfWeek() != sunday);
+    private ZonedDateTime changeToEST(LocalDateTime time){
+        return ZonedDateTime.of(time, ZoneId.of("America/New_York"));
     }
 
     /**
-     * Checks to ensure no other appointments with the same customers are overlapping.
-     * A list of customer appointments are made, and are filtered down to only the appointments that have the same customerID.
-     * From there a loop occurs to check each item in the List and compare the proposed times and the items time.
-     * @param customerId
-     * @param proposedStart
-     * @param proposedEnd
-     * @return
+     * Validates proposed appointment times are within business hours.
+     * @param proposedStart user selected start date and time.
+     * @param proposedEnd user selected end date and time.
+     * @param date user selected date.
+     * @return If proposed times are within business hours.
+     */
+    private boolean checkIfESTHours(LocalDateTime proposedStart, LocalDateTime proposedEnd, LocalDate date){
+        LocalDateTime openBusinessHours = LocalDateTime.of(date, LocalTime.of(8, 0));
+        LocalDateTime closeBusinessHours = LocalDateTime.of(date, LocalTime.of(22, 0));
+
+        LocalDateTime convertStart = changeToEST(proposedStart).toLocalDateTime();
+        LocalDateTime convertEnd = changeToEST(proposedEnd).toLocalDateTime();
+
+        DayOfWeek saturday = DayOfWeek.SATURDAY;
+        DayOfWeek sunday = DayOfWeek.SUNDAY;
+
+        if(convertStart.isAfter(closeBusinessHours)){
+            return false;
+        }
+        if (convertEnd.isAfter(closeBusinessHours)){
+            return false;
+        }
+        if(convertStart.isBefore(openBusinessHours)){
+            return false;
+        }
+        if(convertEnd.isBefore(openBusinessHours)){
+            return false;
+        }
+        if(date.getDayOfWeek() == saturday || date.getDayOfWeek() == sunday){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Checks for conflicting appointment time and dates.
+     * @param customerId selects customer by ID.
+     * @param proposedStart user selected start time.
+     * @param proposedEnd user selected end time.
+     * @return boolean
      */
     private boolean checkAppointmentOverlap(int customerId ,LocalDateTime proposedStart, LocalDateTime proposedEnd) {
         //Create a list of each appointment that a customer is attached too. The customer ID variable will come from the combo box.
@@ -397,12 +403,10 @@ public class AppointmentController implements Initializable {
     }
 
     /**
-     * Checks to ensure no other appointments with the same customers are overlapping while avoiding checking self.
-     * A list of customer appointments are made, and are filtered down to only the appointments that have the same customerID.
-     * From there a loop occurs to check each item in the List and compare the proposed times and the items time.
-     * @param customerId
-     * @param proposedStart
-     * @param proposedEnd
+     * Checks customer records for overlapping appointment times.
+     * @param customerId selects customer by ID.
+     * @param proposedStart user selected start time.
+     * @param proposedEnd user selected end time.
      * @return boolean
      */
     private boolean checkAppointmentOverlapUpdate(int customerId ,LocalDateTime proposedStart, LocalDateTime proposedEnd) {

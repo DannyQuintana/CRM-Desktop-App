@@ -1,7 +1,3 @@
-/**
- * Manages the interaction between the database, view and models.
- */
-
 package controller;
 
 import dao.DBConnection;
@@ -27,6 +23,9 @@ import java.time.format.FormatStyle;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+/**
+ * Manages the interaction between the database, view and models.
+ */
 public class LoginController implements Initializable {
     @FXML private Label timeZoneField;
     @FXML private Label loginTitleLabel;
@@ -39,21 +38,18 @@ public class LoginController implements Initializable {
     @FXML private Label timeZoneLabel;
 
     /**
-     * Retires users timezone and is displayed on the login menu.
+     * Retrieves and displays users timezone.
      */
     public void getTimeZone(){
         ZonedDateTime timeZone = ZonedDateTime.now();
         String result = timeZone.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.FULL));
         timeZoneField.setText(result);
 
-
     }
 
     /**
      * Validates user credentials and either rejects or accepts login.
-     * Compares username and password to stored information on the Database if accepted the main menu is accessed.
-     * Otherwise, an error message is displayed.
-     * @param actionEvent
+     * @param actionEvent validates customer login with click
      */
     public void loginClicked(ActionEvent actionEvent) {
         try{
@@ -87,7 +83,7 @@ public class LoginController implements Initializable {
 
     /**
      * Resets user input.
-     * @param actionEvent
+     * @param actionEvent resets field data.
      */
     public void resetClicked(ActionEvent actionEvent) {
         userNameField.setText("");
@@ -97,8 +93,6 @@ public class LoginController implements Initializable {
 
     /**
      * Loads resource bundle for French or English.
-     * @param url
-     * @param resourceBundle
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {

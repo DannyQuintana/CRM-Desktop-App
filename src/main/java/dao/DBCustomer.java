@@ -2,23 +2,24 @@ package dao;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Alert;
-import javafx.util.converter.LocalDateTimeStringConverter;
 import model.Customer;
-import model.Divisions;
-import model.Users;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static dao.DBConnection.openConnection;
 
+/**
+ * Provides CRUD operations for the customer mySQL table.
+ */
 public class DBCustomer  {
 
+    /**
+     * Returns a list of customers.
+     * @return List of customers.
+     */
     public static ObservableList<Customer> getAllCustomers(){
 
         ObservableList<Customer> customerList = FXCollections.observableArrayList();
@@ -58,27 +59,14 @@ public class DBCustomer  {
         return customerList;
     }
 
-
-    public static String getCustomersName(long ID){
-
-        ObservableList<Customer> customerList = FXCollections.observableArrayList();
-        String name = "";
-
-        try {
-            String sql = "SELECT Customer_Name FROM customers WHERE Customer_ID = ?";
-            PreparedStatement ps = DBConnection.getConnection().prepareStatement(sql);
-            ps.setLong(1, ID);
-
-            ResultSet rs = ps.executeQuery();
-            name = rs.toString();
-
-        } catch (SQLException e){
-            e.printStackTrace();
-        }
-        return name;
-    }
-
-
+    /**
+     * Creates a record on the customers table.
+     * @param name customer name
+     * @param address customer address
+     * @param postalCode customer postal code
+     * @param phone customer phone
+     * @param divisionID customer division id.
+     */
     public static void addCustomer(String name, String address, String postalCode, String phone, int divisionID){
 
         Timestamp createDate = Timestamp.valueOf(LocalDateTime.now());
@@ -99,6 +87,15 @@ public class DBCustomer  {
         }
     }
 
+    /**
+     * Updates a record on the customers table.
+     * @param id customer id
+     * @param name customer name
+     * @param address customer address
+     * @param postalCode customer postal code
+     * @param phone customer phone
+     * @param divisionID customer division ID
+     */
     public static void updateCustomer(int id, String name, String address, String postalCode, String phone, int divisionID){
 
         Timestamp lastUpdate = Timestamp.valueOf(LocalDateTime.now());
@@ -127,7 +124,10 @@ public class DBCustomer  {
     }
 
 
-
+    /**
+     * Deletes a customer record by ID.
+     * @param ID customer ID
+     */
     public static void deleteCustomer(int ID){
 
         try {
@@ -144,6 +144,11 @@ public class DBCustomer  {
 
     }
 
+    /**
+     * Returns a customer record by customerID.
+     * @param customerID customer ID
+     * @return returns a customer ID
+     */
     public static int getCustomer(int customerID) {
         try {
             String sql = "SELECT Customer_ID FROM appointments WHERE Customer_ID = ?";

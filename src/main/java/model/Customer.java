@@ -1,12 +1,11 @@
-/**
- * The Customer model contains the fields and methods to be used for Customers objects.
- */
-
 package model;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
+/**
+ * The Customer model contains the fields and methods to be used for Customers objects.
+ */
 public class Customer {
     private int customerId;
     private String customerName;
@@ -24,16 +23,16 @@ public class Customer {
     public Customer(){}
 
     /**Constructor
-     * @param customerId
-     * @param customerName
-     * @param address
-     * @param postalCode
-     * @param phone
-     * @param createDate
-     * @param createdBy
-     * @param lastUpdated
-     * @param lastUpdatedBy
-     * @param divisionId
+     * @param customerId customer ID
+     * @param customerName customer name
+     * @param address customer address
+     * @param postalCode customer postal code
+     * @param phone customer phone
+     * @param createDate customer created on date
+     * @param createdBy customer created by user
+     * @param lastUpdated customer last updated by date
+     * @param lastUpdatedBy customer last updated by user
+     * @param divisionId division ID
      */
     public Customer(int customerId, String customerName, String address, String postalCode, String phone, LocalDateTime createDate, String createdBy, Timestamp lastUpdated, String lastUpdatedBy, int divisionId) {
         this.customerId = customerId;

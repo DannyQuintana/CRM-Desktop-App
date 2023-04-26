@@ -1,10 +1,6 @@
-/**
- * The Customer controller interacts with the view and DB operations, to display, and Perform CRUD operations on
- * the customer, country, and division tables.
- */
-
 package controller;
 
+import dao.DBAppointment;
 import dao.DBCountries;
 import dao.DBCustomer;
 import dao.DBDivisions;
@@ -18,6 +14,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import model.Appointment;
 import model.Countries;
 import model.Customer;
 import model.Divisions;
@@ -31,6 +28,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+/**
+ * The Customer controller interacts with the view and DB operations, to display, and Perform CRUD operations on
+ * the customer, country, and division tables.
+ */
 public class CustomerController implements Initializable {
     public TextField nameField;
     public TextField addressField;
@@ -52,9 +53,8 @@ public class CustomerController implements Initializable {
     public TableColumn divisionID;
 
     /**
-     * The submitCustomerBtn method is an on actionEvent that will submit NEW customer entries.
-     * The method extracts information from the fields, performs basic validation and then uses the DBCustomer.addCustomer
-     * method to create a new customer entry.
+     * Creates new customer record.
+     * Validates user input then calls DBCustomer.addCustomer() method.
      */
     public void submitCustomerBtn(ActionEvent actionEvent) throws IOException {
         String name = nameField.getText();
@@ -85,12 +85,10 @@ public class CustomerController implements Initializable {
     }
 
     /**
-     * The initialize method populates the customer view by retrieving information from the Database.
-     * Lambda Expression - The lambda expression is used to automatically update the customer infor boxes and
+     * Retrives and populates data.
+     * Lambda Expression - The lambda expression is used to automatically update the customer info boxes and
      * also enables the use of the update button. This expression is not only a quality of life feature for users,
      * but also avoids adding a button, and action event item to the view.
-     * @param url
-     * @param resourceBundle
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -131,8 +129,8 @@ public class CustomerController implements Initializable {
     }
 
     /**
-     * The countryClick method updates the state combo-box depending on which Country is selected.
-     * @param actionEvent
+     * Populates state combo box.
+     * @param actionEvent select country with a click
      */
     public void countryClick(ActionEvent actionEvent) {
         int countryID = country.getSelectionModel().getSelectedIndex();
@@ -153,8 +151,7 @@ public class CustomerController implements Initializable {
     }
 
     /**
-     * The updateCustomerClicked method updates the forms, and combo boxes of the view with the selected customer from
-     * the table view.
+     * Populates text fields with selected customer.
      */
     public void updateCustomerFields(){
         Customer pickedCustomer = (Customer) customerTable.getSelectionModel().getSelectedItem();
@@ -173,7 +170,7 @@ public class CustomerController implements Initializable {
 
     /**
      * The getStateProvidence returns the divisionId.
-     * @return
+     * @return division
      */
     public int getStateProvidence(){
         ObservableList<Divisions> us = DBDivisions.getAllUSA();
@@ -220,8 +217,8 @@ public class CustomerController implements Initializable {
     }
 
     /**
-     * getCountry method returns the countryID
-     * @return
+     * Selects the country ID.
+     * @return country ID
      */
     public int getCountry(){
 
@@ -244,11 +241,20 @@ public class CustomerController implements Initializable {
         return countryID;
     }
 
+    /**
+     * Verifies if customer can be deleted.
+     * @param customerID selects customer by ID.
+     */
+
+    private boolean verifyAppointment(int customerID){
+            ObservableList<Appointment> customerAppointments = DBAppointment.getAppointmentByCustomerId(customerID);
+            return customerAppointments.size() < 1;
+    }
+
 
     /**
-     * The deleteCustomer takes the selected customer, parses the customer ID and then performs a delete operation,
-     * by passing the customerId into the DBCustomer.deleteCustomer() method.
-     * @param actionEvent
+     * Deletes selected customer record.
+     * @param actionEvent deletes customer record on click
      */
     public void deleteCustomer(ActionEvent actionEvent) {
 
@@ -264,19 +270,25 @@ public class CustomerController implements Initializable {
             String parseID = toString.substring(toString.indexOf('[') + 1, toString.indexOf(']'));
             int customerID = Integer.parseInt(parseID);
 
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setContentText("Are you sure you want to delete customer entry?");
-            Optional<ButtonType> select = alert.showAndWait();
+            if(verifyAppointment(selectedCustomer.getCustomerId())){
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setContentText("Are you sure you want to delete customer entry?");
+                Optional<ButtonType> select = alert.showAndWait();
 
-            if (select.get() == ButtonType.OK) {
-                DBCustomer.deleteCustomer(customerID);
+                if (select.get() == ButtonType.OK) {
+                    DBCustomer.deleteCustomer(customerID);
 
-                Alert alert1 = new Alert(Alert.AlertType.INFORMATION);
-                alert1.setContentText("Customer ID: " + customerID + " has been deleted.");
-                alert1.showAndWait();
+                    Alert alert1 = new Alert(Alert.AlertType.INFORMATION);
+                    alert1.setContentText("Customer ID: " + customerID + " has been deleted.");
+                    alert1.showAndWait();
+                    clearAllFields();
+                    customerTable.setItems(DBCustomer.getAllCustomers());
 
-                customerTable.setItems(DBCustomer.getAllCustomers());
-
+                }
+            }else {
+                Alert alert2 = new Alert(Alert.AlertType.ERROR);
+                alert2.setContentText("Customer has scheduled appointments. Appointments must be removed prior to deleting customer record.");
+                alert2.showAndWait();
             }
         }
     }
@@ -293,9 +305,10 @@ public class CustomerController implements Initializable {
     }
 
     /**
+     * Updates customer record.
      * The upDateClicked method parses the information from the text-fields and combo-boxes, and passes the fields as
      * arguments for the DBCustomer.updateCustomer() method.
-     * @param actionEvent
+     * @param actionEvent updates customer record on click
      */
     public void upDateClicked(ActionEvent actionEvent) {
         int id = Integer.parseInt(customerIDField.getText());

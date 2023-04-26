@@ -21,6 +21,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+/**
+ * Manages the interaction between the database, view and models.
+ */
 public class ReportController implements Initializable{
     public TableView<Appointment> appByTypeMonthTable;
     public TableColumn<?, ?> appMonth;
@@ -44,6 +47,9 @@ public class ReportController implements Initializable{
     public TableColumn localTotal;
 
 
+    /**
+     * Populates data on table views and combo-boxes.
+     * */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         appByTypeMonthTable.setItems(DBAppointment.getTypeMonthReport());
@@ -57,11 +63,12 @@ public class ReportController implements Initializable{
         locationCustomerID.setCellValueFactory(new PropertyValueFactory<>("customerId"));
         localLocation.setCellValueFactory(new PropertyValueFactory<>("Location"));
         localTotal.setCellValueFactory(new PropertyValueFactory<>("Total"));
-
-
-
     }
 
+    /**
+     * Filters tableview by contact ID.
+     * @param actionEvent filters tableview on click.
+     */
     public void contactBoxClicked(ActionEvent actionEvent) {
 
         contactTableView.setItems(DBAppointment.getAppointmentByContactId(contactBox.getSelectionModel().getSelectedItem().getContactId()));
@@ -77,6 +84,11 @@ public class ReportController implements Initializable{
         userIDCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
     }
 
+    /**
+     * Returns to main menu
+     * @param actionEvent onclick
+     * @throws IOException catch's bad resource path
+     */
     public void toMainMenu(ActionEvent actionEvent) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("mainView.fxml"));
         Stage stage = (Stage)((Node)actionEvent.getSource()).getScene().getWindow();

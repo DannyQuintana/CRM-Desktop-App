@@ -1,9 +1,8 @@
+package model;
+
 /**
  * The Contact model contains the fields and methods to be used for Contact objects.
  */
-
-package model;
-
 public class Contact {
     private int contactId;
     private String contactName;
@@ -13,9 +12,9 @@ public class Contact {
 
     /**
      * Constructor
-     * @param contactId
-     * @param contactName
-     * @param email
+     * @param contactId contact ID
+     * @param contactName contact name
+     * @param email contact email
      */
     public Contact(int contactId, String contactName, String email){
         this.contactId = contactId;

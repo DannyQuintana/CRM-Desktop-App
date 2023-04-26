@@ -4,6 +4,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/**
+ * Abstract class that provides the initial DB connection.
+ */
 public abstract class DBConnection {
     private static final String protocol = "jdbc";
     private static final String vendor = ":mysql:";
@@ -15,6 +18,10 @@ public abstract class DBConnection {
     private static String password = "Passw0rd!"; // Password
     public static Connection connection;  // Connection Interface
 
+    /**
+     * Opens Database connection.
+     * Allows communication between application and mySQL database.
+     */
     public static void openConnection()
     {
         try {
@@ -28,10 +35,17 @@ public abstract class DBConnection {
         }
     }
 
+    /**
+     * Returns openConnection.
+     * @return Connection
+     */
     public static Connection getConnection(){
         return connection;
     }
 
+    /**
+     * Closes connection to mySQL database.
+     */
     public static void closeConnection() {
         try {
             connection.close();

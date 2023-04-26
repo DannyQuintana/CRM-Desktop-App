@@ -1,7 +1,3 @@
-/**
- * The DateTimeUtilities is used to convert time zones and set meeting notification.
- */
-
 package helper;
 
 import dao.DBAppointment;
@@ -14,12 +10,15 @@ import java.time.*;
 import java.time.temporal.ChronoUnit;
 
 
+/**
+ * The DateTimeUtilities is used to convert time zones and set meeting notification.
+ */
 public class DateTimeUtilities {
 
     /**
      * Converts LocalDateTime objects to UTC ZonedDateTime objects that is returned as a LocalDateTime object.
-     * @param local
-     * @return
+     * @param local selected user date time.
+     * @return a local date time in UTC time.
      */
     public static LocalDateTime convertToUTC(LocalDateTime local){
         ZoneId localZone = ZoneId.systemDefault();
@@ -31,10 +30,11 @@ public class DateTimeUtilities {
         return utcZDT.toLocalDateTime();
     }
 
+
     /**
      * Converts LocalDateTime objects to systemDefault time zones.
-     * @param lDT
-     * @return
+     * @param lDT selected user date time
+     * @return Date and time in users local time.
      */
     public static LocalDateTime convertToLocalTime(LocalDateTime lDT){
         ZoneId local = ZoneId.systemDefault();
@@ -46,7 +46,7 @@ public class DateTimeUtilities {
     }
 
     /**
-     * Checks a list of appoitnments and notifies user with an appointment is within 15 minutes of local time.
+     * Checks a list of appointments and notifies user with an appointment is within 15 minutes of local time.
      */
     public static void appointmentAlarm(){
         ObservableList<Appointment> upcomingAppointment = FXCollections.observableArrayList();
@@ -77,6 +77,9 @@ public class DateTimeUtilities {
                 }
             }
 
+    /**
+     * Shows an alarm when returning to menu
+     */
     public static void appointmentAlarmMenuReturn(){
         ObservableList<Appointment> upcomingAppointment = FXCollections.observableArrayList();
         boolean within15 = false;

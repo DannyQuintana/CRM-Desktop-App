@@ -1,7 +1,3 @@
-/**
- * Manages the interaction between the database, view and models.
- */
-
 package controller;
 
 import dao.*;
@@ -23,6 +19,9 @@ import java.time.*;
 import java.time.temporal.WeekFields;
 import java.util.ResourceBundle;
 
+/**
+ * Manages the interaction between the database, view and models.
+ */
 public class MainController implements Initializable {
     public AnchorPane allAppointments;
     public TableView AppointmentTableView;
@@ -40,8 +39,8 @@ public class MainController implements Initializable {
 
     /**
      * Loads and displays CustomerView
-     * @param actionEvent onclick
-     * @throws IOException
+     * @param actionEvent loads customer view onclick
+     * @throws IOException catch's bad resource path.
      */
     @FXML
     public void addCustomerClicked(ActionEvent actionEvent) throws IOException {
@@ -56,7 +55,7 @@ public class MainController implements Initializable {
     /**
      * Loads and displays Appointment view
      * @param actionEvent onclick
-     * @throws IOException
+     * @throws IOException catch's bad resource path.
      */
     public void AppointmentsClicked(ActionEvent actionEvent) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("addAppointment.fxml"));
@@ -72,7 +71,7 @@ public class MainController implements Initializable {
     /**
      * Loads and displays reports view
      * @param actionEvent onclick
-     * @throws IOException
+     * @throws IOException catch's bad resource path.
      */
     public void reportsClicked(ActionEvent actionEvent) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("reportView.fxml"));
@@ -85,8 +84,7 @@ public class MainController implements Initializable {
 
     /**
      * Filters visible appointments on tableview.
-     * Compares week of year to current date and displays the appoitnments within current week of year.
-     * @param actionEvent select
+     * @param actionEvent Filters appointments to current week on click.
      */
     public void weekAppointmentClicked(ActionEvent actionEvent) {
 
@@ -109,9 +107,8 @@ public class MainController implements Initializable {
     }
 
     /**
-     * Filters visible appointments on tableview.
-     * Filters appointments to current month.
-     * @param actionEvent select
+     * Filters visible appointments on tableview..
+     * @param actionEvent Filters appointments to current month on click.
      */
     public void monthAppointmentClicked(ActionEvent actionEvent) {
         LocalDate current = LocalDate.now();
@@ -133,9 +130,8 @@ public class MainController implements Initializable {
     }
 
     /**
-     * Default view of appointments.
-     * All appointments displayed.
-     * @param actionEvent
+     * View all appointments.
+     * @param actionEvent filters appointments on click
      */
     public void allAppointmentsClicked(ActionEvent actionEvent) {
         AppointmentTableView.setItems(DBAppointment.getAllAppointments());
@@ -155,7 +151,7 @@ public class MainController implements Initializable {
 
     /**
      * Closes DBconnection and program.
-     * @param actionEvent
+     * @param actionEvent closes program on click
      */
     public void exitClicked(ActionEvent actionEvent) {
         Stage exitBtn = (Stage) closeBtn.getScene().getWindow();

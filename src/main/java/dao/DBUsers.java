@@ -2,13 +2,23 @@ package dao;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import model.Customer;
 import model.Users;
 
 import java.sql.*;
 import java.time.LocalDateTime;
 
+/**
+ * Provides CRUD operations on the Users mySQL table.
+ */
 public class DBUsers {
+
+    /**
+     * Verifies user login credentials.
+     * @param connection calls databse connection
+     * @param userName user unique name
+     * @param password user password
+     * @return users information
+     */
     public static Users authorizeUser(Connection connection, String userName, String password) {
 
         try {
@@ -33,6 +43,10 @@ public class DBUsers {
         }
     }
 
+    /**
+     * Returns a List of users.
+     * @return List of users
+     */
     public static ObservableList<Users> getAllUsers() {
 
         ObservableList<Users> usersList = FXCollections.observableArrayList();
@@ -68,6 +82,11 @@ public class DBUsers {
         return usersList;
     }
 
+    /**
+     * Returns a users record by user ID.
+     * @param userID user ID
+     * @return user ID
+     */
     public static int getUser(int userID) {
 
         try {

@@ -1,14 +1,11 @@
-/**
- * The Appointment model is a class that contains all the required fields and methods for Appointment Objects
- * */
-
-
 package model;
 
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
+/**
+ * The Appointment model is a class that contains all the required fields and methods for Appointment Objects
+ * */
 public class Appointment {
     private int appointmentId;
     private String title;
@@ -31,11 +28,9 @@ public class Appointment {
 
 
     /**
-     * Overload used retrieve month and type. This overload is used in the Reports controller
-     * @param month
-     * @param type
-     * @param total
-     */
+     * Overload used retrieve month and type.
+     * This overload is used in the Reports controller
+    */
     public Appointment(String month, String type, int total) {
         this.month = month;
         this.type = type;
@@ -43,10 +38,8 @@ public class Appointment {
     }
 
     /**
-     * Overload used to retrieve customerId and meeting location. This Overload method is used in the reports' controller.
-     * @param customerId
-     * @param location
-     * @param total
+     * Overload used to retrieve customerId and meeting location. T
+     * his Overload method is used in the reports' controller.
      */
     public Appointment(int customerId, String location, int total){
         this.customerId = customerId;
@@ -56,20 +49,20 @@ public class Appointment {
 
     /**
      * Constructor
-     * @param appointmentId
-     * @param title
-     * @param description
-     * @param location
-     * @param type
-     * @param start
-     * @param end
-     * @param createDate
-     * @param createdBy
-     * @param lastUpdate
-     * @param lastUpdatedBy
-     * @param customerId
-     * @param userId
-     * @param contactId
+     * @param appointmentId appointment ID
+     * @param title appointment title
+     * @param description appointment description
+     * @param location appointment location
+     * @param type appointment type
+     * @param start appointment start time
+     * @param end appointment end time
+     * @param createDate appointment created on date
+     * @param createdBy appointment created by user
+     * @param lastUpdate appointment last update time
+     * @param lastUpdatedBy appoinment last updated by user
+     * @param customerId customer ID
+     * @param userId user ID
+     * @param contactId contact ID
      */
     public Appointment(int appointmentId, String title, String description, String location, String type, LocalDateTime start,
                        LocalDateTime end, LocalDateTime createDate, String createdBy, Timestamp lastUpdate, String lastUpdatedBy,
