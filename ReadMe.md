@@ -1,6 +1,6 @@
-# Simple Inventory Management App
+# Simple Customer Relations Management App
 
-This piece of software is a desktop application for managing scheduled appointments and customer information. This program is written using Java and uses a mySQL database to manage these features.
+This piece of software is a desktop application for managing scheduled appointments and customer information.
 
 ## Dependencies
 
